@@ -67,22 +67,33 @@ plt.plot(testX, simY + 3 * simMse ** 0.5, '--g', linewidth=.5)
 # Create dummy sparse and dense datasets
 #########################
 
-# Gridded dummy dataset with specified function, rows (r) and columns (c)
-# The gridded dataset is realized as a random draw from 2D Gaussian Process
+# Gridded dummy dataset with specified function over input space with rows (r) and columns (c)
+# ?????The gridded dataset is realized as a random draw from 2D Gaussian Process
 
+# Function options for creating dummy dataset over input space
+# Branin function
 def branin(X):
     y = (X[:,1]-5.1/(4*np.pi**2)*X[:,0]**2+5*X[:,0]/np.pi-6)**2
     y += 10*(1-1/(8*np.pi))*np.cos(X[:,0])+10
     return(y)
 
-xg1 = np.linspace(-5,10,5)
-xg2 = np.linspace(0,15,5)
-X = np.zeros((xg1.size * xg2.size,2))
-for i,x1 in enumerate(xg1):
-    for j,x2 in enumerate(xg2):
-        X[i+xg1.size*j,:] = [x1,x2]
+# ... function
+# ...
+# ...
+    
 
-Y = branin(X)[:,None]
+# Input space definition
+def grid(r=5, c=5):
+    xg1 = np.linspace(-5,10,r)
+    xg2 = np.linspace(0,15,c)
+
+    X = np.zeros((xg1.size * xg2.size,2))
+    for i,x1 in enumerate(xg1):
+        for j,x2 in enumerate(xg2):
+            X[i+xg1.size*j,:] = [x1,x2]
+    return(branin(X)[:,None])
+
+Y = grid(5,5)
 
 
 
