@@ -18,14 +18,15 @@
 # Licence:     <your licence>
 #-------------------------------------------------------------------------------
 
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pylab as pb
 import GPy
 
+from mpl_toolkits.mplot3d import Axes3D  
+
 #########################
-# Toy in 1-dimensional
+# Toy Gaussian Process in 1-dimensional
 #########################
 
 # Experimental taste of the Gaussian Process (GP) regression
@@ -67,8 +68,9 @@ plt.plot(testX, simY + 3 * simMse ** 0.5, '--g', linewidth=.5)
 # Create dummy sparse and dense datasets
 #########################
 
-# Gridded dummy dataset with specified function over input space with rows (r) and columns (c)
-# ?????The gridded dataset is realized as a random draw from 2D Gaussian Process
+# Grid dummy dataset with specified function over input space with rows (r) and columns (c).
+# The grid dataset is then approximated by 2D (combined) Gaussian Process as a ground truth process.
+# The ground truth process is then used to test and validate different models.
 
 # Function options for creating dummy dataset over input space
 # Branin function
@@ -80,10 +82,9 @@ def branin(X):
 # ... function
 # ...
 # ...
-    
 
-# Input space definition
-def grid(r=5, c=5):
+# Dummy grid dataset defined over input space
+def grid(r, c):
     xg1 = np.linspace(-5,10,r)
     xg2 = np.linspace(0,15,c)
 
@@ -91,27 +92,70 @@ def grid(r=5, c=5):
     for i,x1 in enumerate(xg1):
         for j,x2 in enumerate(xg2):
             X[i+xg1.size*j,:] = [x1,x2]
-    return(branin(X)[:,None])
+    Y = branin(X)  # Call surface function
+    return(X, Y[:,None])
 
-Y = grid(5,5)
+# Show dummy grid dataset
+def showGrid(X, Y, r=5, c=5):
+    x1, x2 = X.reshape(r,c,2)[:,:,0], X.reshape(r,c,2)[:,:,1]
+    Y = Y.reshape(r,c)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    print(x1.shape, x2.shape, Y.shape)
+    ax.plot_surface(x1, x2, Y)
+    ax.set_xlabel('x1')
+    ax.set_ylabel('x2')
+    ax.set_zlabel('Y')
+    plt.show()
+    return None
 
+# Realization of dummy grid data through GP
+# Kernel options
+def kGP():
+    kg = GPy.kern.RBF(input_dim=2, ARD = True)
+    kb = GPy.kern.Bias(input_dim=2)
+    k = kg + kb
+    k.plot()
+    return(k)
 
+# Model specification
+def mGP(X, Y):
+    k = kGP()  # Kernel
+    
+    m = GPy.models.GPRegression(X,Y,k,normalizer=True)  # Specify model
+    m.sum.bias.variance.constrain_bounded(1e-3,1e5)
+    m.sum.rbf.variance.constrain_bounded(1e-3,1e5)
+    m.sum.rbf.lengthscale.constrain_bounded(.1,200.)
+    m.Gaussian_noise.variance.constrain_fixed(1e-3, 1e-1)
+    
+    m.randomize()  # Random initialization
+    m.optimize()  # Optimization
+    m.plot()
+    return(m)
 
+# GP realization of dummy function-based dataset as ground truth GP
+def gtGP(X, Y, r, c):
+    m = mGP(X, Y)  # Train the model over dummy grid dataset
+    
+    xg1 = np.linspace(-5,10,r)
+    xg2 = np.linspace(0,15,c)
 
+    Xp = np.zeros((xg1.size * xg2.size,2))
+    for i,x1 in enumerate(xg1):
+        for j,x2 in enumerate(xg2):
+            Xp[i+xg1.size*j,:] = [x1,x2]
+    # Draw dense GP approximation to the dummy through trained model
+    Yp = m.predict(Xp)[0]
+    return(Xp, Yp)
 
+# Dummy gridded dataset over input space
+r, c = 3, 3  # Define input space 
+X, Y = grid(r,c)  # Dummy grid dataset realized by function
+showGrid(X, Y, r, c)  # Show function dummy grid
 
-
-
-
-
-def grid(r, c):
-
-
-
-
-
-
-
+rGP, cGP = 100, 100   # Define GP prediction/approximation space over input space
+Xp, Yp = gtGP(X, Y, rGP, cGP)  # Approximation
+showGrid(Xp, Yp, rGP, cGP)  # Dummy grid dataset approximated by GP as ground truth
 
 
 #########################
