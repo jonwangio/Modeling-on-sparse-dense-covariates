@@ -147,9 +147,46 @@ def gtGP(X, Y, r, c):
     # Draw dense GP approximation to the dummy through trained model
     Yp = m.predict(Xp)[0]
     return(Xp, Yp)
+    
+# Uncertainty/accuracy ensure of the GP realization: ground truth GP needs to be GOOD!
+def accGP():
+    
+
+# TWO OPTIONS!!!
+# 1_perturbate the ground truth GP before sampling
+# 2_perturbate the randomly sampled points from the GP
+# In either way, we need two types of functions: 
+# (1) random points generation functions, and (2) perturbation functions
+    
+
+# Random point sample from the grid surface
+def randPt(n):
+    
+    
+original_data = np.random.rand(100,100)
+
+fig, (ax, ax2) = plt.subplots(ncols=2)
+im = ax.imshow(original_data, cmap="summer")
+
+
+N = 89
+x = np.random.randint(0,100,size=N)
+y = np.random.randint(0,100,size=N)
+
+random_sample = original_data[x,y]
+sc = ax2.scatter(x,y,c=random_sample, cmap=im.cmap, norm=im.norm)
+
+ax2.set_aspect("equal")
+ax2.set(xlim=ax.get_xlim(), ylim=ax.get_ylim())
+
+fig.colorbar(sc, ax=[ax,ax2], orientation="horizontal")
+plt.show()
+    
+# 
+    
 
 # Dummy gridded dataset over input space
-r, c = 3, 3  # Define input space 
+r, c = 5, 5  # Define input space 
 X, Y = grid(r,c)  # Dummy grid dataset realized by function
 showGrid(X, Y, r, c)  # Show function dummy grid
 
