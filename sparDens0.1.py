@@ -99,9 +99,12 @@ def grid(r, c):
 def showGrid(X, Y, r=5, c=5):
     x1, x2 = X.reshape(r,c,2)[:,:,0], X.reshape(r,c,2)[:,:,1]
     Y = Y.reshape(r,c)
+    print(x1.shape, x2.shape, Y.shape)
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    print(x1.shape, x2.shape, Y.shape)
+    ax.set_xlim3d(np.min(x1),np.max(x1))
+    ax.set_ylim3d(np.min(x2),np.max(x2))
+    ax.set_zlim3d(np.min(Y),np.max(Y))
     ax.plot_surface(x1, x2, Y)
     ax.set_xlabel('x1')
     ax.set_ylabel('x2')
@@ -160,28 +163,23 @@ def accGP():
     
 
 # Random point sample from the grid surface
-def randPt(n):
+def randPt(X,Y,n):
+    dim = X.shape[0]  # Input data dimension
+    randInd = np.random.randint(0,dim,size=n)  # Index of n random draw
     
+    x = X[randInd,:]  # Random draw of X
+    y = Y[randInd,:]  # Random draw of Y
     
-original_data = np.random.rand(100,100)
-
-fig, (ax, ax2) = plt.subplots(ncols=2)
-im = ax.imshow(original_data, cmap="summer")
-
-
-N = 89
-x = np.random.randint(0,100,size=N)
-y = np.random.randint(0,100,size=N)
-
-random_sample = original_data[x,y]
-sc = ax2.scatter(x,y,c=random_sample, cmap=im.cmap, norm=im.norm)
-
-ax2.set_aspect("equal")
-ax2.set(xlim=ax.get_xlim(), ylim=ax.get_ylim())
-
-fig.colorbar(sc, ax=[ax,ax2], orientation="horizontal")
-plt.show()
-    
+    # Plot 3d random points
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.set_xlim3d(np.min(x[:,0]),np.max(x[:,0]))
+    ax.set_ylim3d(np.min(x[:,1]),np.max(x[:,1]))
+    ax.set_zlim3d(np.min(Y),np.max(Y))
+    ax.scatter(x[:,0], x[:,1], y)
+    plt.show()
+    return (x, y)
+        
 # 
     
 
