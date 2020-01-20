@@ -23,11 +23,13 @@ import matplotlib.pyplot as plt
 import pylab as pb
 import GPy
 
+from scipy import stats
 from mpl_toolkits.mplot3d import Axes3D  
 
-#########################
-# Toy Gaussian Process in 1-dimensional
-#########################
+
+#####################################################
+# 01 Toy Gaussian Process in 1-dimensional
+#####################################################
 
 # Experimental taste of the Gaussian Process (GP) regression
 # Sample data from a sin/cos conjunctions
@@ -64,14 +66,17 @@ plt.plot(testX, simY - 3 * simMse ** 0.5, '--g', linewidth=.5)
 plt.plot(testX, simY + 3 * simMse ** 0.5, '--g', linewidth=.5)
 
 
-#########################
-# Create dummy sparse and dense datasets
-#########################
+#####################################################
+# 02 Create dummy sparse and dense datasets
+#####################################################
 
 # Grid dummy dataset with specified function over input space with rows (r) and columns (c).
 # The grid dataset is then approximated by 2D (combined) Gaussian Process as a ground truth process.
 # The ground truth process is then used to test and validate different models.
 
+#==================================
+# 02_1 Real function based dummy dataset
+#==================================
 # Function options for creating dummy dataset over input space
 # Branin function
 def branin(X):
@@ -112,6 +117,9 @@ def showGrid(X, Y, r=5, c=5):
     plt.show()
     return None
 
+#==================================
+# 02_2 GP realization as ground truth processes
+#==================================
 # Realization of dummy grid data through GP
 # Kernel options
 def kGP():
@@ -151,17 +159,20 @@ def gtGP(X, Y, r, c):
     Yp = m.predict(Xp)[0]
     return(Xp, Yp)
     
-# Uncertainty/accuracy ensure of the GP realization: ground truth GP needs to be GOOD!
+# Uncertainty/accuracy control of the GP realization: ground truth GP needs to be GOOD!
 def accGP():
     
 
+    
+#==================================
+# 02_3 Sparse point observation from the ground truth processes
+#==================================
 # TWO OPTIONS!!!
 # 1_perturbate the ground truth GP before sampling
 # 2_perturbate the randomly sampled points from the GP
 # In either way, we need two types of functions: 
 # (1) random points generation functions, and (2) perturbation functions
     
-
 # Random point sample from the grid surface
 def randPt(X,Y,n):
     dim = X.shape[0]  # Input data dimension
@@ -179,12 +190,46 @@ def randPt(X,Y,n):
     ax.scatter(x[:,0], x[:,1], y)
     plt.show()
     return (x, y)
-        
-# 
-    
 
+# More strategic sampling from characteristic locations (critical points?)
+def cPt(X,Y,n):
+    Z = Y.reshape(r,c)  # Reshape to surface
+    Zy, Zx = np.gradient(Z)  # Get local minima and maxima through gradient
+    Zy, Zx = Zy.ravel(), Zx.ravel()  # Reshape into single column                                            
+    ind = np.where(((Zx>=-0.5) & (Zy<=0.5)) | ((Zy>=-0.5) & (Zy<=0.5)))  # Index of critical points
+    randInd = np.random.choice(ind[0], n)
+    
+    x = X[randInd,:]  # Random draw of X
+    y = Y[randInd,:]  # Random draw of Y
+    
+    # Plot 3d random points
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.set_xlim3d(np.min(x[:,0]),np.max(x[:,0]))
+    ax.set_ylim3d(np.min(x[:,1]),np.max(x[:,1]))
+    ax.set_zlim3d(np.min(Y),np.max(Y))
+    ax.scatter(x[:,0], x[:,1], y)
+    plt.show()
+    return (x, y)
+
+        
+ 
+#==================================
+# 02_4 Dense covariate from the ground truth processes
+#==================================
+
+
+
+
+
+
+
+
+#==================================
+# 02_5 Section '__main__'
+#==================================
 # Dummy gridded dataset over input space
-r, c = 5, 5  # Define input space 
+r, c = 100, 100  # Define input space 
 X, Y = grid(r,c)  # Dummy grid dataset realized by function
 showGrid(X, Y, r, c)  # Show function dummy grid
 
@@ -193,9 +238,9 @@ Xp, Yp = gtGP(X, Y, rGP, cGP)  # Approximation
 showGrid(Xp, Yp, rGP, cGP)  # Dummy grid dataset approximated by GP as ground truth
 
 
-#########################
-# REAL sparse and dense datasets read-in
-#########################
+#####################################################
+# 03 REAL sparse and dense datasets read-in
+#####################################################
 
 
 
@@ -203,18 +248,18 @@ showGrid(Xp, Yp, rGP, cGP)  # Dummy grid dataset approximated by GP as ground tr
 
 
 
-#########################
-# Georeferencing REAL datasets
-#########################
+#####################################################
+# 04 Georeferencing REAL datasets
+#####################################################
 
 
 
 
 
 
-#########################
-# REAL Training, testing and validation
-#########################
+#####################################################
+# 05 REAL Training, testing and validation
+#####################################################
 
 
 
