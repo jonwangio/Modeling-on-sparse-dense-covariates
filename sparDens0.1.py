@@ -217,8 +217,16 @@ def cPt(X,Y,n):
 #==================================
 # 02_4 Dense covariate from the ground truth processes
 #==================================
+# One handy option is to directly leverage the learned model to generate covariate(s)
+# The covariate(s) are random draw from the posterior distribution of surfaces in the learned model
+# Then the most ideal result should give a strong free form coregionalization matrix
+# B = WW', where, as B is normalized to correlation, the diagonal is close to 1.
 
-
+# Generate dense covariate through few random points from the ground truth GP
+def denseCov(X,Y,n):
+    x, y = randPt(X,Y,n)
+    # A proximation of the ground truth through few points
+    Xp, Yp = gtGP(x, y, r, c)  # Take advantage of the gtGP function
 
 
 
