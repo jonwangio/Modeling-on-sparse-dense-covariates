@@ -101,10 +101,11 @@ def grid(r, c):
     return(X, Y[:,None])
 
 # Show dummy grid dataset
-def showGrid(X, Y, r=5, c=5):
+def showGrid(X, Y):
+    r, c = int(np.sqrt(X.shape[0])), int(np.sqrt(X.shape[0]))  # Rows and columns
     x1, x2 = X.reshape(r,c,2)[:,:,0], X.reshape(r,c,2)[:,:,1]
     Y = Y.reshape(r,c)
-    print(x1.shape, x2.shape, Y.shape)
+    print('Surface dimensions in x1, x2, and y are ', x1.shape, x2.shape, Y.shape)
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.set_xlim3d(np.min(x1),np.max(x1))
@@ -145,8 +146,10 @@ def mGP(X, Y):
     return(m)
 
 # GP realization of dummy function-based dataset as ground truth GP
-def gtGP(X, Y, r, c):
+def gtGP(X, Y, s):
+    r, c = int(np.sqrt(X.shape[0])*s), int(np.sqrt(X.shape[0])*s)  # Rows and columns with scaled density
     m = mGP(X, Y)  # Train the model over dummy grid dataset
+    print(m)
     
     xg1 = np.linspace(-5,10,r)
     xg2 = np.linspace(0,15,c)
@@ -157,7 +160,7 @@ def gtGP(X, Y, r, c):
             Xp[i+xg1.size*j,:] = [x1,x2]
     # Draw dense GP approximation to the dummy through trained model
     Yp = m.predict(Xp)[0]
-    return(Xp, Yp)
+    return(Xp, Yp, m)
     
 # Uncertainty/accuracy control of the GP realization: ground truth GP needs to be GOOD!
 def accGP():
@@ -217,19 +220,46 @@ def cPt(X,Y,n):
 #==================================
 # 02_4 Dense covariate from the ground truth processes
 #==================================
-# One handy option is to directly leverage the learned model to generate covariate(s)
-# The covariate(s) are random draw from the posterior distribution of surfaces in the learned model
-# Then the most ideal result should give a strong free form coregionalization matrix
+# One handy option is to generate covariate(s) through linear transformation.
+# Other options can be insufficient observations or other components to be involved.
+# The most ideal result should give a strong free form coregionalization matrix
 # B = WW', where, as B is normalized to correlation, the diagonal is close to 1.
 
-# Generate dense covariate through few random points from the ground truth GP
-def denseCov(X,Y,n):
+# Generate dense covariate through linear transformation of the ground truth GP
+# Scale, shift in x1, x2, and y, convolution and etc..
+def linCov(X,Y):
+    scale = np.linspace(-2,2,1)
+    for s in scale:
+        print('Scale Y by ', s)
+        Ys = Y*s
+        showGrid(X, Ys)
+    return (X, Ys)
+
+
+# Generate dense covariate as a insufficient observation of the ground truth GP
+def insuffCov(X,Y,n):
+    # Insufficiently observed points
     x, y = randPt(X,Y,n)
     # A proximation of the ground truth through few points
-    Xp, Yp = gtGP(x, y, r, c)  # Take advantage of the gtGP function
+    Xp, Yp, m = gtGP(x, y, r, c)  # Take advantage of the gtGP function
+    
 
-
-
+# Generate dense covariate as noisy versions of the ground truth GP
+def noiseCov(X, Y):
+    
+    
+    
+# Learn coregionalization model
+def coregionGP(X0, Y0, X1, Y1):
+    X0widx = np.c_[X0,np.ones(X0.shape[0])*0]  # Add a column of coregionalized index through np.c_
+    X1widx = np.c_[X1,np.ones(X1.shape[0])*1]
+    X = np.r_[X0widx,X1widx]  # Row-wise merge all X through np.r_
+    Y = np.r_[Y0,Y1]
+    
+    kern = GPy.kern.RBF(1,lengthscale=0.1)**GPy.kern.Coregionalize(input_dim=1,output_dim=2, rank=1)
+    m = GPy.models.GPRegression(X,Y,kern)
+    m.optimize()
+    return (m)
 
 
 
@@ -237,13 +267,13 @@ def denseCov(X,Y,n):
 # 02_5 Section '__main__'
 #==================================
 # Dummy gridded dataset over input space
-r, c = 100, 100  # Define input space 
+r, c = 50, 50  # Define input space 
 X, Y = grid(r,c)  # Dummy grid dataset realized by function
-showGrid(X, Y, r, c)  # Show function dummy grid
+showGrid(X, Y)  # Show function dummy grid
 
-rGP, cGP = 100, 100   # Define GP prediction/approximation space over input space
-Xp, Yp = gtGP(X, Y, rGP, cGP)  # Approximation
-showGrid(Xp, Yp, rGP, cGP)  # Dummy grid dataset approximated by GP as ground truth
+scale = 2   # Define GP prediction/approximation space as densified input space
+Xp, Yp, m = gtGP(X, Y, scale)  # Approximation
+showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 
 
 #####################################################
