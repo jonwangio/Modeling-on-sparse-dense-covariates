@@ -259,6 +259,10 @@ def coregionGP(X0, Y0, X1, Y1):
     kern = GPy.kern.RBF(1,lengthscale=0.1)**GPy.kern.Coregionalize(input_dim=1,output_dim=2, rank=1)
     m = GPy.models.GPRegression(X,Y,kern)
     m.optimize()
+    print(m)
+    B = m.sum.mul.coregion.B
+    print('The correlation matrix is')
+    (B/np.sqrt(np.diag(B))).T/np.sqrt(np.diag(B))
     return (m)
 
 
