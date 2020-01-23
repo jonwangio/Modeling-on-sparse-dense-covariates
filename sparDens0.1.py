@@ -249,15 +249,23 @@ def noiseCov(X, Y):
     
     
     
+    
+    
+#==================================
+# 02_5 Coregionalized processes (Multi-task GP/CoKriging) investigation
+#==================================
+
 # Learn coregionalization model
 def coregionGP(X0, Y0, X1, Y1):
-    X0widx = np.c_[X0,np.ones(X0.shape[0])*0]  # Add a column of coregionalized index through np.c_
-    X1widx = np.c_[X1,np.ones(X1.shape[0])*1]
-    X = np.r_[X0widx,X1widx]  # Row-wise merge all X through np.r_
-    Y = np.r_[Y0,Y1]
+#    X0widx = np.c_[X0,np.ones(X0.shape[0])*0]  # Add a column of coregionalized index through np.c_
+#    X1widx = np.c_[X1,np.ones(X1.shape[0])*1]
+#    X = np.r_[X0widx,X1widx]  # Row-wise merge all X through np.r_
+#    Y = np.r_[Y0,Y1]
+    X = np.array([X0, X1])
+    Y = np.array([Y0, Y1])
     
-    kern = GPy.kern.RBF(1,lengthscale=0.1)**GPy.kern.Coregionalize(input_dim=1,output_dim=2, rank=1)
-    m = GPy.models.GPRegression(X,Y,kern)
+    kern = GPy.kern.RBF(input_dim=1)**GPy.kern.Coregionalize(input_dim=2,output_dim=2, rank=1)
+    m = GPy.models.GPCoregionalizedRegression(X,Y,kern)
     m.optimize()
     print(m)
     B = m.sum.mul.coregion.B
@@ -278,6 +286,11 @@ showGrid(X, Y)  # Show function dummy grid
 scale = 2   # Define GP prediction/approximation space as densified input space
 Xp, Yp, m = gtGP(X, Y, scale)  # Approximation
 showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
+
+n = 50  # Number of point observations
+
+Xcov, Ycov = linCov(Xp, Yp)  # Dense covariates through linear transformation
+m = coregionGP(Xp, Yp, Xcov, Ycov)  # Coregionalization model
 
 
 #####################################################
