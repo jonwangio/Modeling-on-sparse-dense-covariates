@@ -261,14 +261,19 @@ def coregionGP(X0, Y0, X1, Y1):
 #    X1widx = np.c_[X1,np.ones(X1.shape[0])*1]
 #    X = np.r_[X0widx,X1widx]  # Row-wise merge all X through np.r_
 #    Y = np.r_[Y0,Y1]
-    X = np.array([X0, X1])
+#    kern = GPy.kern.RBF(input_dim=1)**GPy.kern.Coregionalize(input_dim=2,output_dim=2, rank=1)
+#    m = GPy.models.GPCoregionalizedRegression(X,Y,kern)
+
+    X = np.array([X0, X1])  # Prepare X and Y for Intrinsic Coregionalization Model (ICM)
     Y = np.array([Y0, Y1])
-    
-    kern = GPy.kern.RBF(input_dim=1)**GPy.kern.Coregionalize(input_dim=2,output_dim=2, rank=1)
-    m = GPy.models.GPCoregionalizedRegression(X,Y,kern)
+                  
+    K = GPy.kern.RBF(2)  # 2-D Radial Basis Function
+    icm = GPy.util.multioutput.ICM(input_dim=2,num_outputs=2,kernel=K)
+    m = GPy.models.GPCoregionalizedRegression(X,Y,kernel=icm)    
     m.optimize()
     print(m)
-    B = m.sum.mul.coregion.B
+    W = m.ICM.B.W
+    B = W*W.T
     print('The correlation matrix is')
     (B/np.sqrt(np.diag(B))).T/np.sqrt(np.diag(B))
     return (m)
@@ -279,7 +284,7 @@ def coregionGP(X0, Y0, X1, Y1):
 # 02_5 Section '__main__'
 #==================================
 # Dummy gridded dataset over input space
-r, c = 50, 50  # Define input space 
+r, c = 10, 10  # Define input space 
 X, Y = grid(r,c)  # Dummy grid dataset realized by function
 showGrid(X, Y)  # Show function dummy grid
 
