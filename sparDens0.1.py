@@ -28,7 +28,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 #####################################################
-# 01 Toy Gaussian Process in 1-dimensional
+# 01 1D Toy Gaussian Process
 #####################################################
 
 # Experimental taste of the Gaussian Process (GP) regression
@@ -164,7 +164,7 @@ def gtGP(X, Y, s):
     
 # Uncertainty/accuracy control of the GP realization: ground truth GP needs to be GOOD!
 def accGP():
-    
+    return None
 
     
 #==================================
@@ -177,7 +177,7 @@ def accGP():
 # (1) random points generation functions, and (2) perturbation functions
     
 # Random point sample from the grid surface
-def randPt(X,Y,n):
+def randPt(X, Y, n):
     dim = X.shape[0]  # Input data dimension
     randInd = np.random.randint(0,dim,size=n)  # Index of n random draw
     
@@ -245,11 +245,37 @@ def insuffCov(X,Y,n):
     
 
 # Generate dense covariate as noisy versions of the ground truth GP
-def noiseCov(X, Y):
+def noiseCov(X, Y, m, s):
+    # Simple noise follows N(mean, std**2)
+    mean = m
+    std = s
+    Ynoise = std*np.random.randn(Y.size, 1)+mean
+    Y += Ynoise  # Call surface function
+    showGrid(X, Y)
+    return(X, Y)
     
-    
-    
-    
+
+# Generate dense covariate with advanced GP controlled noise
+# Kernel definition
+def ker(a, b, var, lenscale):
+    # Squared exponential kernel
+    var = .5
+    sqdist = np.sum(a**2,1).reshape(-1,1) + np.sum(b**2,1) - 2*np.dot(a, b.T)
+    return np.exp(-var*sqdist)
+
+def noiseGPCov(X, Y, var, lenscale):
+    # GP controlled noise drawn from a covariance matrix generated from kernel
+    K = ker(X, X)
+    # Cholesky decomposition
+    L = np.linalg.cholesky(K + 1e-6*np.eye(K.shape[0]))
+    # Draw sample (can be multiple)
+    Y_prior = np.dot(L, np.random.normal(size=(X.shape[0],1)))  # Draw 1 sample
+    Y += Y_prior
+    showGrid(X, Y)
+    showGrid(X, Y_prior)
+    return(X, Y_prior)
+
+
     
 #==================================
 # 02_5 Coregionalized processes (Multi-task GP/CoKriging) investigation
