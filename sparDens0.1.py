@@ -24,6 +24,8 @@ import pylab as pb
 import GPy
 
 from scipy import stats
+from random import random
+from math import cos, sin, floor, sqrt, pi, ceil
 from mpl_toolkits.mplot3d import Axes3D  
 
 
@@ -89,9 +91,9 @@ def branin(X):
 # ...
 
 # Dummy grid dataset defined over input space
-def grid(r, c):
-    xg1 = np.linspace(-5,10,r)
-    xg2 = np.linspace(0,15,c)
+def grid(x1min, x1max, x2min, x2max, yr, c):
+    xg1 = np.linspace(x1min,x1max,r)
+    xg2 = np.linspace(x2min,x2max,c)
 
     X = np.zeros((xg1.size * xg2.size,2))
     for i,x1 in enumerate(xg1):
@@ -176,6 +178,18 @@ def accGP():
 # In either way, we need two types of functions: 
 # (1) random points generation functions, and (2) perturbation functions
     
+# Plot point in 3d
+def plotPt(x, y):
+    # Plot 3d random points
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.set_xlim3d(np.min(x[:,0]),np.max(x[:,0]))
+    ax.set_ylim3d(np.min(x[:,1]),np.max(x[:,1]))
+    ax.set_zlim3d(np.min(y),np.max(y))
+    ax.scatter(x[:,0], x[:,1], y)
+    plt.show()
+    return None
+    
 # Random point sample from the grid surface
 def randPt(X, Y, n):
     dim = X.shape[0]  # Input data dimension
@@ -185,13 +199,74 @@ def randPt(X, Y, n):
     y = Y[randInd,:]  # Random draw of Y
     
     # Plot 3d random points
-    fig = plt.figure()
-    ax = Axes3D(fig)
-    ax.set_xlim3d(np.min(x[:,0]),np.max(x[:,0]))
-    ax.set_ylim3d(np.min(x[:,1]),np.max(x[:,1]))
-    ax.set_zlim3d(np.min(Y),np.max(Y))
-    ax.scatter(x[:,0], x[:,1], y)
-    plt.show()
+    plotPt(x, y)
+    return (x, y)
+
+
+# Poisson-disc distribution random sampling
+# r as minimal distance between points, k as number of points, dist as euclidian distance function
+def poissonPt(X, Y, r, k, random=random):
+    width, height = int(np.sqrt(X.shape[0])), int(np.sqrt(X.shape[0]))  # Rows and columns as number grids
+    tau = 2 * pi
+    cellsize = r / sqrt(2)  # Cellsize defined to draw one point
+
+    grid_width = int(ceil(width / cellsize))  # Number of grid as width
+    grid_height = int(ceil(height / cellsize))  # Number of grid as height
+    grid = [None] * (grid_width * grid_height)
+    
+    def dist(a, b):  # Euclidean distance
+        dx = a[0] - b[0]
+        dy = a[1] - b[1]
+        return sqrt(dx * dx + dy * dy)
+    
+    def grid_coords(p):  # Grid location as grid index
+        return int(floor(p[0] / cellsize)), int(floor(p[1] / cellsize))
+
+    def fits(p, gx, gy):
+        yrange = list(range(max(gy - 2, 0), min(gy + 3, grid_height)))
+        for x in range(max(gx - 2, 0), min(gx + 3, grid_width)):
+            for y in yrange:
+                g = grid[x + y * grid_width]
+                if g is None:
+                    continue
+                if dist(p, g) <= r:
+                    return False
+        return True
+
+    p = width * random(), height * random()
+    queue = [p]
+    grid_x, grid_y = grid_coords(p)
+    grid[grid_x + grid_y * grid_width] = p
+
+    while queue:
+        qi = int(random() * len(queue))
+        qx, qy = queue[qi]
+        queue[qi] = queue[-1]
+        queue.pop()
+        for _ in range(k):
+            alpha = tau * random()
+            d = r * sqrt(3 * random() + 1)
+            px = qx + d * cos(alpha)
+            py = qy + d * sin(alpha)
+            if not (0 <= px < width and 0 <= py < height):
+                continue
+            p = (px, py)
+            grid_x, grid_y = grid_coords(p)
+            if not fits(p, grid_x, grid_y):
+                continue
+            queue.append(p)
+            grid[grid_x + grid_y * grid_width] = p
+    
+    # Project grid index p to index of column shaped X
+    p = [p for p in grid if p is not None]
+    p = np.array(p).astype(int)
+    ind = p[:,0] * width + p[:,1]
+    
+    x = X[ind,:]  # Random draw of X
+    y = Y[ind,:]  # Random draw of Y
+    
+    # Plot 3d random points
+    plotPt(x, y)
     return (x, y)
 
 # More strategic sampling from characteristic locations (critical points?)
@@ -206,13 +281,7 @@ def cPt(X,Y,n):
     y = Y[randInd,:]  # Random draw of Y
     
     # Plot 3d random points
-    fig = plt.figure()
-    ax = Axes3D(fig)
-    ax.set_xlim3d(np.min(x[:,0]),np.max(x[:,0]))
-    ax.set_ylim3d(np.min(x[:,1]),np.max(x[:,1]))
-    ax.set_zlim3d(np.min(Y),np.max(Y))
-    ax.scatter(x[:,0], x[:,1], y)
-    plt.show()
+    plotPt(x, y)
     return (x, y)
 
         
@@ -254,6 +323,15 @@ def noiseCov(X, Y, m, s):
     showGrid(X, Y)
     return(X, Y)
     
+# More advanced noise from the "Colors of Noise"
+def noiseBasis():
+    
+    return None
+
+def noiseColorCov():
+    
+    return None
+    
 
 # Generate dense covariate with advanced GP controlled noise
 # Kernel definition
@@ -274,7 +352,6 @@ def noiseGPCov(X, Y, var, lenscale):
     showGrid(X, Y)
     showGrid(X, Y_prior)
     return(X, Y_prior)
-
 
     
 #==================================
@@ -310,17 +387,25 @@ def coregionGP(X0, Y0, X1, Y1):
 # 02_5 Section '__main__'
 #==================================
 # Dummy gridded dataset over input space
-r, c = 10, 10  # Define input space 
-X, Y = grid(r,c)  # Dummy grid dataset realized by function
+x1min, x1max, x2min, x2max = -5, 10, 0, 15  # Domain of the input space
+r, c = 30, 30  # Grid number of the input space 
+X, Y = grid(x1min,x1max,x2min,x2max,r,c)  # Dummy grid dataset realized by function
 showGrid(X, Y)  # Show function dummy grid
 
+# Ground truth representation through GP (parameters are var and lengthscale)
 scale = 2   # Define GP prediction/approximation space as densified input space
 Xp, Yp, m = gtGP(X, Y, scale)  # Approximation
 showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 
-n = 50  # Number of point observations
+# Point samples as point observation
+k = 500  # Number of point observations
+r = 2  # Minimal distance (number of grid) between points
+x, y = poissonPt(X, Y, r, k, random=random)
 
+# Dense covariate(s) with noise
 Xcov, Ycov = linCov(Xp, Yp)  # Dense covariates through linear transformation
+
+# Prediction/modeling test through GP Coregionalization
 m = coregionGP(Xp, Yp, Xcov, Ycov)  # Coregionalization model
 
 
