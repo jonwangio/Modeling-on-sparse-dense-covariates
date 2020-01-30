@@ -260,7 +260,7 @@ def poissonPt(X, Y, r, k, random=random):
     # Project grid index p to index of column shaped X
     p = [p for p in grid if p is not None]
     p = np.array(p).astype(int)
-    ind = p[:,0] * width + p[:,1]
+    ind = (p[:,0]-1) * width + p[:,1]
     
     x = X[ind,:]  # Random draw of X
     y = Y[ind,:]  # Random draw of Y
