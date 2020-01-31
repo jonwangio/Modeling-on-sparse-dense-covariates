@@ -187,6 +187,9 @@ def plotPt(x, y):
     ax.set_ylim3d(np.min(x[:,1]),np.max(x[:,1]))
     ax.set_zlim3d(np.min(y),np.max(y))
     ax.scatter(x[:,0], x[:,1], y)
+    ax.set_xlabel('x1')
+    ax.set_ylabel('x2')
+    ax.set_zlabel('Y')
     plt.show()
     return None
     
@@ -398,7 +401,7 @@ Xp, Yp, m = gtGP(X, Y, scale)  # Approximation
 showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 
 # Point samples as point observation
-k = 500  # Number of point observations
+k = 200  # Number of point observations
 r = 2  # Minimal distance (number of grid) between points
 x, y = poissonPt(X, Y, r, k, random=random)
 
@@ -406,7 +409,7 @@ x, y = poissonPt(X, Y, r, k, random=random)
 Xcov, Ycov = linCov(Xp, Yp)  # Dense covariates through linear transformation
 
 # Prediction/modeling test through GP Coregionalization
-m = coregionGP(Xp, Yp, Xcov, Ycov)  # Coregionalization model
+m_co = coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
 
 
 #####################################################
