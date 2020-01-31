@@ -380,8 +380,7 @@ def coregionGP(X0, Y0, X1, Y1):
     print(m)
     W = m.ICM.B.W
     B = W*W.T
-    print('The correlation matrix is')
-    (B/np.sqrt(np.diag(B))).T/np.sqrt(np.diag(B))
+    print('The correlation matrix is \n', (B/np.sqrt(np.diag(B))).T/np.sqrt(np.diag(B)))
     return (m)
 
 
@@ -401,8 +400,8 @@ Xp, Yp, m = gtGP(X, Y, scale)  # Approximation
 showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 
 # Point samples as point observation
-k = 200  # Number of point observations
-r = 2  # Minimal distance (number of grid) between points
+k = 10  # Number of point observations
+r = 5  # Minimal distance (number of grid) between points
 x, y = poissonPt(X, Y, r, k, random=random)
 
 # Dense covariate(s) with noise

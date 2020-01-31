@@ -1,0 +1,36 @@
++++++++++++++++++++++++++++++++
+Ground truth GP properties
++++++++++++++++++++++++++++++++
+Name : GP regression
+Objective : -2145.436731619364
+Number of Parameters : 5
+Number of Optimization Parameters : 4
+Updates : True
+Parameters:
+  GP_regression.           |               value  |   constraints    |  priors
+  sum.rbf.variance         |  271.03254915314034  |  0.001,100000.0  |        
+  sum.rbf.lengthscale      |             [ 4.76533806, 42.95160687]  |    0.1,200.0     |        
+  sum.bias.variance        |    99896.6860378484  |  0.001,100000.0  |        
+  Gaussian_noise.variance  |               0.001  |    +ve fixed     |        
+Surface dimensions in x1, x2, and y are  (60, 60) (60, 60) (60, 60)
+
+
+
+
++++++++++++++++++++++++++++++++
+Coregionalization
++++++++++++++++++++++++++++++++
+Name : gp
+Objective : -27986.757138418823
+Number of Parameters : 8
+Number of Optimization Parameters : 8
+Updates : True
+Parameters:
+  gp.                                    |                  value  |  constraints  |  priors
+  ICM.rbf.variance                       |      33.17731713399781  |      +ve      |        
+  ICM.rbf.lengthscale                    |      4.438743853425919  |      +ve      |        
+  ICM.B.W                                |                 (2, 1)  |               |        
+  ICM.B.kappa                            |                   (2,)  |      +ve      |        
+  mixed_noise.Gaussian_noise_0.variance  |    0.13435647443257226  |      +ve      |        
+  mixed_noise.Gaussian_noise_1.variance  |  1.717013708785337e-14  |      +ve      |        
+The correlation matrix is
