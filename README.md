@@ -18,4 +18,4 @@ Using Earth Observation (EO) data as a complement or even replacement of ground-
 
 Concept
 -------------------
-<img src="images/SRCNN.png" height=100% width=25%>
+<img src="/images/00_origFunc.png" width="450" height="400">
