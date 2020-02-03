@@ -14,7 +14,7 @@ Thus, here in this snippet, I try to significantly narrow down the scenarios in 
 
 Concept and terminology
 -------------------
-Using Earth Observation (EO) data as a complement or even replacement of ground-based sparse measurements is prevalent in many mapping activities, relevant ones can be soil, humidity, pollutants, particles, energy and etc.. Such application of EO data in understanding and interpreting geographic processes becomes universal along the increasing availability of satellite imagery data, which renders the interpolating point measurements assisted by gridded imagery data as a scientific problem.
+Using Earth Observation (EO) data as a complement or even replacement of ground-based sparse measurements is prevalent in many mapping activities, relevant ones can be soil, humidity, pollutants, particles, energy, etc. Such application of EO data in understanding and interpreting geographic processes becomes universal along the increasing availability of satellite imagery data, which renders the interpolating point measurements assisted by gridded imagery data as a scientific problem. In reflection of the title, I coin the problem as *Sparse point interpolation with dense grid covariate(s)*. To investigate such problem, there are, again, already many potential scenarios. Such as the grid covariate (satellite imagery data) can either weakly or strongly correlated to the point observation... 
 
 
 
