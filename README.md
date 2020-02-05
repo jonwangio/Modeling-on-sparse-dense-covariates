@@ -17,23 +17,24 @@ Here in this snippet, I would start to touch on this topic for both scientific a
 
 Thus the experiment is deployed with dummy datasets and then the real ones.
 
-2 Concepts and techniques
+2 Concepts
 -------------------
 Using Earth Observation (EO) data as a complement or even replacement of ground-based sparse measurements is prevalent in many mapping activities, relevant ones can be soil, humidity, pollutants, particles, energy, etc. Such application of EO data in understanding and interpreting geographic processes becomes universal along the increasing availability of satellite imagery data, which renders the interpolating point measurements assisted by gridded imagery data as a scientific problem. In reflection of the title, I coin the problem as **Sparse point interpolation with dense grid covariate(s)**. To investigate such problem, there are, again, already many potential scenarios: the grid covariate (satellite imagery data) can either weakly or strongly correlated to the point observation; the point observations can be dense or sparse, the point observations can be regularly or irregularly distributed; one or both of the grid covariate and point observations can be noise perturbed; the noises can be of different properties (noise colors) and intensities...But I will try to not reduce the scenarios any more and inspect them incrementally.
 
-### Concepts
 The concept is intuitive: I will start to explore how field reconstruction is impacted by scenarios of observations at hand, this can simply be inspected by watching the accuracy variation along with different scenarios. Then I will use real datasets for comparison and see if such variation is manifested. 
 
-To realize the concept, a dummy dataset is created representing any field that can be modelled by _f_ (Fig.1). In geostatistics, we also would like to know what the most conventional parameters are so that reconstructed field through geostatistical methods can be compared and validated. Thus I also try to approximate the dummy datasets using the most frequently used geostatistical method: the _Kriging_, which is more widely known as the _Gaussian Process_. Here I will continue to use _Gaussian Process_ for the notion that [it is more general in the field statistics and has a longer history](http://www.gaussianprocess.org/). Holding this dummy field with ground truth geostatistical parameters, the point observations and their grid covariate are created out of this ground truth field to simulate scenarios of situations we may encounter. For instance, a simple scenario could be achieved by linear transformation of the ground truth field to obtain the grid covariate, while the point observations can be [semi-random](https://blog.demofox.org/2017/05/29/when-random-numbers-are-too-random-low-discrepancy-sequences/) samples from the ground truth field (Fig.1). More general scenarios can be obtained by simulating and adding possible [noises](https://en.wikipedia.org/wiki/Colors_of_noise) on top of the simple scenario with only linearly transformation. 
-
+### Dummy dataset
+To realize the concept, a dummy dataset is created representing any field that can be modelled by _f_ (Fig.1). In geostatistics, we also would like to know what the most conventional parameters are so that reconstructed field through geostatistical methods can be compared and validated. Thus I also try to approximate the dummy datasets using the most frequently used geostatistical method: the _Kriging_, which is more widely known as the _Gaussian Process_. Here I will continue to use _Gaussian Process_ for the notion that [it is more general in the field statistics and has a longer history](http://www.gaussianprocess.org/). Holding this dummy field with ground truth geostatistical parameters, the point observations and their grid covariate are created out of this ground truth field to simulate scenarios of situations we may encounter. For instance, a simple scenario could be achieved by linear transformation of the ground truth field to obtain the grid covariate, while the point observations can be [semi-random](https://blog.demofox.org/2017/05/29/when-random-numbers-are-too-random-low-discrepancy-sequences/) samples from the ground truth field (Fig.1). More general scenarios can be obtained by simulating and adding possible [noises](https://en.wikipedia.org/wiki/Colors_of_noise) on top of the simple scenario with only linearly transformation, whereas points can also be perturbed and more sparse.
 
 <img src="/images/(20200130)Framework.png"> 
 
 _Fig.1 Conceptual design for examining field reconstruction through dummy point and grid covariate datasets._
 
-
 The reconstruction can be achieved through either conventional geostatistical methods, or more advanced machine learning based techniques, but in either case the problem remains in the domain of regression, so any regression technique is subject to be used for comparison or setting the benchmark.
 
+### Real datasets
 
 
-<img src="/images/00_origFunc.png" width="350" height="300">
+
+
+<img src="/images/(20200130)realData.png">
