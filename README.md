@@ -29,4 +29,4 @@ The concept is intuitive.
 
 
 
-<img src="/images/(20200130)Framework.png" width="350" height="300">
+<img src="/images/00_origFunc.png" width="350" height="300">
