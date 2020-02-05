@@ -35,6 +35,4 @@ The reconstruction can be achieved through either conventional geostatistical me
 ### Real datasets
 
 
-
-
-<img src="/images/(20200130)realData.png">
+<img src="/images/(20200130)realData.png" width="450" height="350">
