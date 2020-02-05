@@ -402,10 +402,12 @@ showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 # Point samples as point observation
 k = 10  # Number of point observations
 r = 5  # Minimal distance (number of grid) between points
-x, y = poissonPt(X, Y, r, k, random=random)
+x, y = noiseCov(X, Y, m=100, s=30)
+x, y = poissonPt(x, y, r, k, random=random)
 
 # Dense covariate(s) with noise
-Xcov, Ycov = linCov(Xp, Yp)  # Dense covariates through linear transformation
+Xcov, Ycov = linCov(Xp, Yp)  # Dense covariate through linear transformation
+Xcov, Ycov = noiseCov(Xcov, Ycov, m=-200, s=30)  # Dense covariate with controlled noise added
 
 # Prediction/modeling test through GP Coregionalization
 m_co = coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
