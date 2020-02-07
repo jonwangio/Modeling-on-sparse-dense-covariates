@@ -23,7 +23,7 @@ Using Earth Observation (EO) data as a complement or even replacement of ground-
 
 The concept is intuitive: I will start to explore how field reconstruction is impacted by scenarios of observations at hand, this can simply be inspected by watching the accuracy variation along with different scenarios. Then I will use real datasets for comparison and see if such variation is manifested. 
 
-### Dummy dataset
+### 2.1 Dummy dataset
 To realize the concept, a dummy dataset is created representing any field that can be modelled by _f_ (Fig.1). In geostatistics, we also would like to know what the most conventional parameters are so that reconstructed field through geostatistical methods can be compared and validated. Thus I also try to approximate the dummy datasets using the most frequently used geostatistical method: the _Kriging_, which is more widely known as the _Gaussian Process_. Here I will continue to use _Gaussian Process_ for the notion that [it is more general in the field statistics and has a longer history](http://www.gaussianprocess.org/). Holding this dummy field with ground truth geostatistical parameters, the point observations and their grid covariate are created out of this ground truth field to simulate scenarios of situations we may encounter. For instance, a simple scenario could be achieved by linear transformation of the ground truth field to obtain the grid covariate, while the point observations can be [semi-random](https://blog.demofox.org/2017/05/29/when-random-numbers-are-too-random-low-discrepancy-sequences/) samples from the ground truth field (Fig.1). More general scenarios can be obtained by simulating and adding possible [noises](https://en.wikipedia.org/wiki/Colors_of_noise) on top of the simple scenario with only linearly transformation, whereas points can also be perturbed and more sparse.
 
 <img src="/images/(20200130)Framework.png"> 
@@ -32,7 +32,7 @@ _Fig.1 Conceptual design for examining field reconstruction through dummy point 
 
 The reconstruction can be achieved through either conventional geostatistical methods, or more advanced machine learning based techniques, but in either case the problem remains in the domain of regression, so any regression technique is subject to be used for comparison or setting the benchmark (to be decided in progress).
 
-### Real datasets
+### 2.2 Real datasets
 The rationale of selecting real life cases is that continuous field is preferred. In the application of interpolating point observations, I would like to first avoid tricky situations of encountering sharp edges and patchness on the surface of fields. Thus I attempt to avoid any form of recognizable edges or boundaries in terms of the so called [_fiat_ and _bona fide_ boundaries](http://www.columbia.edu/~av72/papers/Ppr_2000.pdf). In this sense, airborne geographic phenonmenon which disperse over space and time would be handy choices. Here, I use near surface air temperature and pollutant NO<sub>2</sub> (Fig.2). Examination of these phenomena is practically significance as relevant to our environment, climate, and health. Below is a sample map of surface temperature and NO<sub>2</sub> at local scale around the city of Utrecht, the Netherlands.
 
 <img src="/images/(20200130)realData.png" width="600" height="350">
@@ -42,7 +42,7 @@ _Fig.2 Real datasets: air pollution (left) and surface temperature (right)._
 Both of the maps provide spatial distribution of temperature and NO<sub>2</sub> with resolution higher than 30m. If one needs to see this kind of maps as frequent as daily or even hourly, no existing sensor would meet the demand. In fact, creating such maps daily or hourly largely relies on _in-situ_ observations, which can be dense or sparse depends on the place. In recent decades, the development of EO infrasctructure provides a significant complement to the _in-situ_ observations. However, the power of the EO in complementing the ground based _in-situ_ has not been thoroughly inspected. For instance, whether different spatial and temporal resolutions of the EO can capture the variations of the target phenomenon. More importantly, what EO actually "see" can be quite different from the target phenomenon measured near the ground, such as temperature--[the gap between surface and near surface air temperature is insufficiently understood](https://www.sciencedirect.com/science/article/pii/S0034425703000798). This potential weak correlation is well aligned with the scenario of using less desirable grid covariate for point observation interpolation. In short, framing these real life cases into the problem of **Sparse point interpolation with dense grid covariate(s)** is suitable.
 
 
-### Techniques
+### 2.3 Techniques
 
 
 
