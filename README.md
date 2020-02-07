@@ -30,11 +30,26 @@ To realize the concept, a dummy dataset is created representing any field that c
 
 _Fig.1 Conceptual design for examining field reconstruction through dummy point and grid covariate datasets._
 
-The reconstruction can be achieved through either conventional geostatistical methods, or more advanced machine learning based techniques, but in either case the problem remains in the domain of regression, so any regression technique is subject to be used for comparison or setting the benchmark.
+The reconstruction can be achieved through either conventional geostatistical methods, or more advanced machine learning based techniques, but in either case the problem remains in the domain of regression, so any regression technique is subject to be used for comparison or setting the benchmark (to be decided in progress).
 
 ### Real datasets
-
+The rationale of selecting real life cases is that continuous field is preferred. In the application of interpolating point observations, I would like to first avoid tricky situations of encountering sharp edges and patchness on the surface of fields. Thus I attempt to avoid any form of recognizable edges or boundaries in terms of the so called [_fiat_ and _bona fide_ boundaries](http://www.columbia.edu/~av72/papers/Ppr_2000.pdf). In this sense, airborne geographic phenonmenon which disperse over space and time would be handy choices. Here, I use near surface air temperature and pollutant NO<sub>2</sub> (Fig.2). Examination of these phenomena is practically significance as relevant to our environment, climate, and health. Below is a sample map of surface temperature and NO<sub>2</sub> at local scale around the city of Utrecht, the Netherlands.
 
 <img src="/images/(20200130)realData.png" width="600" height="350">
 
 _Fig.2 Real datasets: air pollution (left) and surface temperature (right)._
+
+Both of the maps provide spatial distribution of temperature and NO<sub>2</sub> with resolution higher than 30m. If one needs to see this kind of maps as frequent as daily or even hourly, no existing sensor would meet the demand. In fact, creating such maps daily or hourly largely relies on _in-situ_ observations, which can be dense or sparse depends on the place. In recent decades, the development of EO infrasctructure provides a significant complement to the _in-situ_ observations. However, the power of the EO in complementing the ground based _in-situ_ has not been thoroughly inspected. For instance, whether different spatial and temporal resolutions of the EO can capture the variations of the target phenomenon. More importantly, what EO actually "see" can be quite different from the target phenomenon measured near the ground, such as temperature--[the gap between surface and near surface air temperature is insufficiently understood](https://www.sciencedirect.com/science/article/pii/S0034425703000798). This potential weak correlation is well aligned with the scenario of using less desirable grid covariate for point observation interpolation. In short, framing these real life cases into the problem of **Sparse point interpolation with dense grid covariate(s)** is suitable.
+
+
+### Techniques
+
+
+
+
+
+
+
+
+
+
