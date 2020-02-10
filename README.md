@@ -58,6 +58,8 @@ Critical actions can easily be identified at each point of data generation: grou
 
 [e1]: http://chart.apis.google.com/chart?cht=tx&chl=acc=f(actions)
  ,where **actions** are parameterized according to the nature of the actions themselves. For instance, the **action** of generating point samples can be parameterized by the distribution of the sample locations. In this case, by saying "distribution", I need quantities such as _randomness_ and _adjacency_ (sparsity or density to separate samples). I also need sampling schemes such as [_blind_ or _adaptive_](https://ieeexplore.ieee.org/abstract/document/6112220) to create samples following parameterized distribution. For another instance, to make the point samples less ideal and more general, the **action** of adding noise to point samples can be parameterized according to how intense the noise can be. In this case, by saying "how intense" or "intensity", I may further constrain the idea as two quantities: _variance_(noise value is large or small) and _lengthscale_(how quickly the noise varies across space). However, apart from these particular cases, how many actions are expected and what are the parameters? It seems the **action(s)** can be arranged incrementally to render dummy datasets from ideal to general as in table below:
+ 
+Here, I identify ## major actions, which boil down hierarchically into quantities to be parameterized...
 
 
 ### 3.2 Action parameterization
