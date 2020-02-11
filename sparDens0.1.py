@@ -207,8 +207,9 @@ def randPt(X, Y, n):
 
 
 # Poisson-disc distribution random sampling
-# r as minimal distance between points, k as number of points, dist as euclidian distance function
-def poissonPt(X, Y, r, k, random=random):
+# r as minimal distance between points, k as number of candidate points, 
+# dist as euclidian distance function
+def poissonPt(X, Y, r, k=10, random=random):
     width, height = int(np.sqrt(X.shape[0])), int(np.sqrt(X.shape[0]))  # Rows and columns as number grids
     tau = 2 * pi
     cellsize = r / sqrt(2)  # Cellsize defined to draw one point
@@ -317,10 +318,8 @@ def insuffCov(X,Y,n):
     
 
 # Generate dense covariate as noisy versions of the ground truth GP
-def noiseCov(X, Y, m, s):
+def noiseCov(X, Y, mean, std):
     # Simple noise follows N(mean, std**2)
-    mean = m
-    std = s
     Ynoise = std*np.random.randn(Y.size, 1)+mean
     Y += Ynoise  # Call surface function
     showGrid(X, Y)
@@ -379,9 +378,10 @@ def coregionGP(X0, Y0, X1, Y1):
     m.optimize()
     print(m)
     W = m.ICM.B.W
-    B = W*W.T
-    print('The correlation matrix is \n', (B/np.sqrt(np.diag(B))).T/np.sqrt(np.diag(B)))
-    return (m)
+    B = W*W.T  # Covariance matrix
+    Bnorm = (B/np.sqrt(np.diag(B))).T/np.sqrt(np.diag(B))  # Correlation as normalized covariance matrix
+    print('The correlation matrix is \n', Bnorm)
+    return (m, Bnorm)
 
 
 
@@ -399,18 +399,31 @@ scale = 2   # Define GP prediction/approximation space as densified input space
 Xp, Yp, m = gtGP(X, Y, scale)  # Approximation
 showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 
-# Point samples as point observation
-k = 10  # Number of point observations
-r = 5  # Minimal distance (number of grid) between points
-x, y = noiseCov(X, Y, m=100, s=30)
-x, y = poissonPt(x, y, r, k, random=random)
+##############
+# Scenario run
+##############
 
-# Dense covariate(s) with noise
-Xcov, Ycov = linCov(Xp, Yp)  # Dense covariate through linear transformation
-Xcov, Ycov = noiseCov(Xcov, Ycov, m=-200, s=30)  # Dense covariate with controlled noise added
+# BASE SCENARIO: blind point samples and noise-free linear covariate
+totalScen = 20  # Total scenarios as number of parameter values
+#totalScen = f(lengthscale)
+corr = []
 
-# Prediction/modeling test through GP Coregionalization
-m_co = coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
+for s in range(totalScen):
+    # Point samples as point observation
+    r = s+1  # Minimal distance (number of grid) separating points
+    # X, Y = noiseCov(Xp, Yp, mean=100, std=30)  # Add noise to GP ground truth before point sampling
+    x, y = poissonPt(Xp, Yp, r)
+    
+    # Dense covariate(s) with noise
+    Xcov, Ycov = linCov(Xp, Yp)  # Dense covariate through linear transformation
+    # Xcov, Ycov = noiseCov(Xcov, Ycov, mean=-200, std=30)  # Dense covariate with controlled noise added
+    
+    # Prediction/modeling test through GP Coregionalization
+    mCov, Bnorm = coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
+    corr.append(Bnorm[0,1])
+    
+    plt.close('all')
+    print("Finished scenario: ", r)
 
 
 #####################################################
