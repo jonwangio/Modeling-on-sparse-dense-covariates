@@ -125,21 +125,23 @@ def showGrid(X, Y):
 #==================================
 # Realization of dummy grid data through GP
 # Kernel options
-def kGP():
-    kg = GPy.kern.RBF(input_dim=2, ARD = True)
-    kb = GPy.kern.Bias(input_dim=2)
-    k = kg + kb
+def kern():
+    kg = GPy.kern.RBF(input_dim=2, ARD=True)
+    #kb = GPy.kern.Bias(input_dim=2)
+    k = kg #+ kb
     k.plot()
     return(k)
 
 # Model specification
-def mGP(X, Y):
-    k = kGP()  # Kernel
+def model(X, Y):
+    k = kern()  # Kernel
     
     m = GPy.models.GPRegression(X,Y,k,normalizer=True)  # Specify model
-    m.sum.bias.variance.constrain_bounded(1e-3,1e5)
-    m.sum.rbf.variance.constrain_bounded(1e-3,1e5)
-    m.sum.rbf.lengthscale.constrain_bounded(.1,200.)
+    #m.sum.bias.variance.constrain_bounded(1e-3,1e5)
+    #m.sum.rbf.variance.constrain_bounded(1e-3,1e5)
+    m.rbf.variance.constrain_bounded(1e-3,1e5)
+    #m.sum.rbf.lengthscale.constrain_bounded(.1,200.)
+    m.rbf.lengthscale.constrain_bounded(.1,200.)
     m.Gaussian_noise.variance.constrain_fixed(1e-3, 1e-1)
     
     m.randomize()  # Random initialization
@@ -150,7 +152,7 @@ def mGP(X, Y):
 # GP realization of dummy function-based dataset as ground truth GP
 def gtGP(X, Y, s):
     r, c = int(np.sqrt(X.shape[0])*s), int(np.sqrt(X.shape[0])*s)  # Rows and columns with scaled density
-    m = mGP(X, Y)  # Train the model over dummy grid dataset
+    m = model(X, Y)  # Train the model over dummy grid dataset
     print(m)
     
     xg1 = np.linspace(-5,10,r)
@@ -372,7 +374,7 @@ def coregionGP(X0, Y0, X1, Y1):
     X = np.array([X0, X1])  # Prepare X and Y for Intrinsic Coregionalization Model (ICM)
     Y = np.array([Y0, Y1])
                   
-    K = GPy.kern.RBF(2)  # 2-D Radial Basis Function
+    K = GPy.kern.RBF(2, ARD=True)  # 2-D Radial Basis Function
     icm = GPy.util.multioutput.ICM(input_dim=2,num_outputs=2,kernel=K)
     m = GPy.models.GPCoregionalizedRegression(X,Y,kernel=icm)    
     m.optimize()
@@ -403,10 +405,11 @@ showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 # Scenario run
 ##############
 
-# BASE SCENARIO: blind point samples and noise-free linear covariate
+# BASE SCENARIO: blind point samples and noise-free linear transformed covariate
 totalScen = 20  # Total scenarios as number of parameter values
 #totalScen = f(lengthscale)
 corr = []
+lengthscales = []
 
 for s in range(totalScen):
     # Point samples as point observation
@@ -421,6 +424,7 @@ for s in range(totalScen):
     # Prediction/modeling test through GP Coregionalization
     mCov, Bnorm = coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
     corr.append(Bnorm[0,1])
+    lengthscales.append(mCov.ICM.rbf.lengthscale)
     
     plt.close('all')
     print("Finished scenario: ", r)
