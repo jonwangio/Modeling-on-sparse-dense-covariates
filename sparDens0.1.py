@@ -80,14 +80,31 @@ plt.plot(testX, simY + 3 * simMse ** 0.5, '--g', linewidth=.5)
 # 02_1 Real function based dummy dataset
 #==================================
 # Function options for creating dummy dataset over input space
+
+##############
+# Possible functions
+##############
 # Branin function
 def branin(X):
     y = (X[:,1]-5.1/(4*np.pi**2)*X[:,0]**2+5*X[:,0]/np.pi-6)**2
     y += 10*(1-1/(8*np.pi))*np.cos(X[:,0])+10
-    return(y)
+    return (y)
 
-# ... function
-# ...
+# Prior random Gaussian Processes
+# Arbitrary kernel definition
+def arbKer(a, b, var, gamma):
+    # Squared exponential kernel
+    sqdist = np.sum(a**2,1).reshape(-1,1) + np.sum(b**2,1) - 2*np.dot(a, b.T)
+    return var*np.exp(-0.5*sqdist/(gamma**2))
+
+def priorGP(X, var, gamma):
+    # GP controlled noise drawn from a covariance matrix generated from kernel
+    K = arbKer(X, X, var, gamma)
+    # Cholesky decomposition
+    L = np.linalg.cholesky(K + 1e-6*np.eye(K.shape[0]))
+    # Draw sample (can be multiple)
+    Y = np.dot(L, np.random.normal(size=(X.shape[0],1)))  # Draw 1 sample
+    return (Y)
 # ...
 
 # Dummy grid dataset defined over input space
@@ -99,8 +116,10 @@ def grid(x1min, x1max, x2min, x2max, yr, c):
     for i,x1 in enumerate(xg1):
         for j,x2 in enumerate(xg2):
             X[i+xg1.size*j,:] = [x1,x2]
-    Y = branin(X)  # Call surface function
-    return(X, Y[:,None])
+    # From surface function options
+    #Y = branin(X)
+    Y = priorGP(X, var=300, gamma=3)
+    return(X, Y)  #Y[:,None])
 
 # Show dummy grid dataset
 def showGrid(X, Y):
@@ -338,16 +357,9 @@ def noiseColorCov():
     
 
 # Generate dense covariate with advanced GP controlled noise
-# Kernel definition
-def ker(a, b, var, lenscale):
-    # Squared exponential kernel
-    var = .5
-    sqdist = np.sum(a**2,1).reshape(-1,1) + np.sum(b**2,1) - 2*np.dot(a, b.T)
-    return np.exp(-var*sqdist)
-
-def noiseGPCov(X, Y, var, lenscale):
+def noiseGPCov(X, Y, var, gamma):
     # GP controlled noise drawn from a covariance matrix generated from kernel
-    K = ker(X, X)
+    K = arbKer(X, X, var=1, gamma=1)  # Reuse the arbitrary kernel to control noise
     # Cholesky decomposition
     L = np.linalg.cholesky(K + 1e-6*np.eye(K.shape[0]))
     # Draw sample (can be multiple)
@@ -410,6 +422,7 @@ totalScen = 20  # Total scenarios as number of parameter values
 #totalScen = f(lengthscale)
 corr = []
 lengthscales = []
+Yinf = []
 
 for s in range(totalScen):
     # Point samples as point observation
@@ -423,8 +436,14 @@ for s in range(totalScen):
     
     # Prediction/modeling test through GP Coregionalization
     mCov, Bnorm = coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
+    
     corr.append(Bnorm[0,1])
     lengthscales.append(mCov.ICM.rbf.lengthscale)
+    Yinf.append(mCov.Y[len(y):])
+    
+    #xinf = mCov.X[len(x):,0:-1]
+    #yinf = mCov.Y[len(y):]
+    #showGrid(xinf, yinf)
     
     plt.close('all')
     print("Finished scenario: ", r)
