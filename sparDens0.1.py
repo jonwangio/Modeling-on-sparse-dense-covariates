@@ -427,13 +427,16 @@ RMSE_all = []  # Mean sqaured error between Yp and Y_hat
 
 for s in range(totalScen):
     # Point samples as point observation
-    r = s+1  # Minimal distance (number of grid) separating points
+    #r = s+1  # Minimal distance (number of grid) separating points
+    r = 10
+    
     # X, Y = noiseCov(Xp, Yp, mean=100, std=30)  # Add noise to GP ground truth before point sampling
     x, y = poissonPt(Xp, Yp, r)
     
     # Dense covariate(s) with noise
     Xcov, Ycov = linCov(Xp, Yp)  # Dense covariate through linear transformation
-    # Xcov, Ycov = noiseCov(Xcov, Ycov, mean=-200, std=30)  # Dense covariate with controlled noise added
+    #Xcov, Ycov = noiseCov(Xcov, Ycov, mean=-0, std=30)  # Dense covariate with controlled noise added
+    Xcov, Ycov = noiseGPCov(X, Y, var=1, gamma=0.5*s)
     
     # Model inference through GP Coregionalization
     mCov, Bnorm = coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
@@ -441,7 +444,7 @@ for s in range(totalScen):
     # Prediction through optimized model
     Xnew = np.hstack([Xp,np.zeros_like(Yp)])  # Using existing Xp as new location for prediction on sparse process
     noise_dict = {'output_index':Xnew[:,-1].astype(int)}  # Indicate noise model to be used
-    Y_hat = m.predict(Xnew,Y_metadata=noise_dict)[0]
+    Y_hat = mCov.predict(Xnew,Y_metadata=noise_dict)[0]
     
     RMSE = np.sqrt(np.square(np.subtract(Yp,Y_hat)).mean())
     
@@ -456,7 +459,7 @@ for s in range(totalScen):
     #showGrid(xinf, yinf)
     
     plt.close('all')
-    print("Finished scenario: ", r)
+    print("Finished scenario: ", s+1)
     print("RMSE is: ", RMSE)
     print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
 
