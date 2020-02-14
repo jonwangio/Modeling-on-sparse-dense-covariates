@@ -420,9 +420,10 @@ showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 # BASE SCENARIO: blind point samples and noise-free linear transformed covariate
 totalScen = 20  # Total scenarios as number of parameter values
 #totalScen = f(lengthscale)
-corr = []
-lengthscales = []
-Yinf = []
+corr = []  # Inferred coregionalized GP correlation
+lengthscales = []  # Inferred lengthscale
+Y_hatAll = []  # Inferred Y_hat
+MSE_all = []  # Mean sqaured error between Yp and Y_hat
 
 for s in range(totalScen):
     # Point samples as point observation
@@ -436,10 +437,13 @@ for s in range(totalScen):
     
     # Prediction/modeling test through GP Coregionalization
     mCov, Bnorm = coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
+    Y_hat = mCov.Y[len(y):]
+    MSE = np.square(np.subtract(Yp,Y_hat)).mean()
     
     corr.append(Bnorm[0,1])
     lengthscales.append(mCov.ICM.rbf.lengthscale)
-    Yinf.append(mCov.Y[len(y):])
+    Y_hatAll.append(Y_hat)
+    MSE_all.append(MSE)
     
     #xinf = mCov.X[len(x):,0:-1]
     #yinf = mCov.Y[len(y):]
@@ -447,6 +451,8 @@ for s in range(totalScen):
     
     plt.close('all')
     print("Finished scenario: ", r)
+    print("MSE is: ", MSE)
+    print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
 
 
 #####################################################
