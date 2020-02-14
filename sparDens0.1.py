@@ -409,7 +409,7 @@ X, Y = grid(x1min,x1max,x2min,x2max,r,c)  # Dummy grid dataset realized by funct
 showGrid(X, Y)  # Show function dummy grid
 
 # Ground truth representation through GP (parameters are var and lengthscale)
-scale = 2   # Define GP prediction/approximation space as densified input space
+scale = 1   # Define GP prediction/approximation space as densified input space
 Xp, Yp, m = gtGP(X, Y, scale)  # Approximation
 showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 
@@ -423,7 +423,7 @@ totalScen = 20  # Total scenarios as number of parameter values
 corr = []  # Inferred coregionalized GP correlation
 lengthscales = []  # Inferred lengthscale
 Y_hatAll = []  # Inferred Y_hat
-MSE_all = []  # Mean sqaured error between Yp and Y_hat
+RMSE_all = []  # Mean sqaured error between Yp and Y_hat
 
 for s in range(totalScen):
     # Point samples as point observation
@@ -435,23 +435,29 @@ for s in range(totalScen):
     Xcov, Ycov = linCov(Xp, Yp)  # Dense covariate through linear transformation
     # Xcov, Ycov = noiseCov(Xcov, Ycov, mean=-200, std=30)  # Dense covariate with controlled noise added
     
-    # Prediction/modeling test through GP Coregionalization
+    # Model inference through GP Coregionalization
     mCov, Bnorm = coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
-    Y_hat = mCov.Y[len(y):]
-    MSE = np.square(np.subtract(Yp,Y_hat)).mean()
+    
+    # Prediction through optimized model
+    Xnew = np.hstack([Xp,np.zeros_like(Yp)])  # Using existing Xp as new location for prediction on sparse process
+    noise_dict = {'output_index':Xnew[:,-1].astype(int)}  # Indicate noise model to be used
+    Y_hat = m.predict(Xnew,Y_metadata=noise_dict)[0]
+    
+    RMSE = np.sqrt(np.square(np.subtract(Yp,Y_hat)).mean())
     
     corr.append(Bnorm[0,1])
     lengthscales.append(mCov.ICM.rbf.lengthscale)
     Y_hatAll.append(Y_hat)
-    MSE_all.append(MSE)
+    RMSE_all.append(RMSE)
     
+    #showGrid(Xnew[:,:-1], Y_hat)
     #xinf = mCov.X[len(x):,0:-1]
     #yinf = mCov.Y[len(y):]
     #showGrid(xinf, yinf)
     
     plt.close('all')
     print("Finished scenario: ", r)
-    print("MSE is: ", MSE)
+    print("RMSE is: ", RMSE)
     print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
 
 
