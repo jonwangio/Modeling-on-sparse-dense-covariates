@@ -24,12 +24,15 @@
 #-------------------------------------------------------------------------------
 
 import numpy as np
-from agroundTruth import *
-from pt import *
+import groundTruth as gt
+import point as pt
+import covar as cov
+import perturb as pb
 
-#==================================
-# 02_4 Dense covariate from the ground truth processes
-#==================================
+
+#####################################################
+# 01 Dense covariate from the ground truth processes
+#####################################################
 # One handy option is to generate covariate(s) through linear transformation.
 # Other options can be insufficient observations or other components to be involved.
 # The most ideal result should give a strong free form coregionalization matrix
@@ -42,15 +45,15 @@ def linCov(X,Y):
     for s in scale:
         print('Scale Y by ', s)
         Ys = Y*s
-        showGrid(X, Ys)
+        gt.showGrid(X, Ys)
     return (X, Ys)
 
 
 # Generate dense covariate as a insufficient observation of the ground truth GP
 def insuffCov(X,Y,n):
-    r, c = int(np.sqrt(X.shape[0])*s), int(np.sqrt(X.shape[0])*s)  # Rows and columns with scaled density
+    r, c = int(np.sqrt(X.shape[0])), int(np.sqrt(X.shape[0]))  # Rows and columns
     # Insufficiently observed points
-    x, y = randPt(X,Y,n)
+    x, y = pt.randPt(X,Y,n)
     # A proximation of the ground truth through few points
-    Xp, Yp, m = gtGP(x, y, r, c)  # Take advantage of the gtGP function
+    Xp, Yp, m = gt.gtGP(x, y, r, c)  # Take advantage of the gtGP function
     return (Xp, Yp)

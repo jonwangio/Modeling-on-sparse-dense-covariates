@@ -24,7 +24,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import pylab as pb
+import pylab as pl
 import GPy
 
 from scipy import stats
@@ -34,7 +34,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 import groundTruth as gt
 import point as pt
-import covar
+import covar as cov
 import perturb as pb
 
 
@@ -46,8 +46,8 @@ import perturb as pb
 # Sample data from a sin/cos conjunctions
 X = np.linspace(0.05,0.95,10)[:,None]
 Y = -np.cos(np.pi*X) +np.sin(4*np.pi*X) + np.random.randn(10,1)*0.05
-pb.figure()
-pb.plot(X,Y,'kx',mew=1.5)
+pl.figure()
+pl.plot(X,Y,'kx',mew=1.5)
 
 # Specify the kernel and model
 k = GPy.kern.RBF(input_dim=1, variance=1., lengthscale=1.)
@@ -80,28 +80,25 @@ plt.plot(testX, simY + 3 * simMse ** 0.5, '--g', linewidth=.5)
 #####################################################
 # 02 2D Gaussian Process
 #####################################################
-    
-
-
+   
 #==================================
-# 02_2 Section '__main__'
+# 02_1 Ground truth data generation
 #==================================
 # Dummy gridded dataset over input space
 x1min, x1max, x2min, x2max = -5, 10, 0, 15  # Domain of the input space
 row, col = 30, 30  # Grid number of the input space
 var, gamma = 15**2, 3
-X, Y = grid(x1min,x1max,x2min,x2max,row,col,var,gamma)  # Dummy grid dataset realized by function
-showGrid(X, Y)  # Show function dummy grid
+X, Y = gt.grid(x1min,x1max,x2min,x2max,row,col,var,gamma)  # Dummy grid dataset realized by function
+gt.showGrid(X, Y)  # Show function dummy grid
 
 # Ground truth representation through GP (parameters are var and lengthscale)
 scale = 1   # Define GP prediction/approximation space as densified input space
-Xp, Yp, m = gtGP(X, Y, scale)  # Approximation
-showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
+Xp, Yp, m = gt.gtGP(X, Y, scale)  # Approximation
+gt.showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 
-##############
-# Scenario run
-##############
-
+#==================================
+# 02_2 Scenario test
+#==================================
 # BASE SCENARIO: blind point samples and noise-free linear transformed covariate
 scen_1 = 30  # Total scenarios as number of parameter values
 scen_2 = 30
@@ -118,18 +115,19 @@ for s1 in range(scen_1):
         r = 3
         
         # X, Y = noiseCov(Xp, Yp, mean=100, std=30)  # Add noise to GP ground truth before point sampling
-        x, y = poissonPt(Xp, Yp, r)
+        x, y = pt.poissonPt(Xp, Yp, r)
         
         # Dense covariate(s) with noise
-        Xcov, Ycov = linCov(Xp, Yp)  # Dense covariate through linear transformation
+        Xcov, Ycov = cov.linCov(Xp, Yp)  # Dense covariate through linear transformation
         '''
         !!! Dense covariate with controlled noise !!!
         '''
         #Xcov, Ycov = noiseCov(Xcov, Ycov, mean=-0, std=30)
-        Xcov, Ycov = noiseGPCov(X, Y, var=var/(30-scen_1), gamma=gamma/(30-scen_2))
+        sc_1, sc_2 = (1/15)*scen_1, (1/15)*scen_2  # Each scenario runs with scaled var and gamma
+        Xcov, Ycov = pb.noiseGPCov(X, Y, var=sc_1*var, gamma=sc_2*gamma)
         
         # Model inference through GP Coregionalization
-        mCov, Bnorm = coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
+        mCov, Bnorm = gt.coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
         
         # Prediction through optimized model
         Xnew = np.hstack([Xp,np.zeros_like(Yp)])  # Using existing Xp as new location for prediction on sparse process
@@ -141,6 +139,8 @@ for s1 in range(scen_1):
         corr.append(Bnorm[0,1])
         lengthscales.append(mCov.ICM.rbf.lengthscale)
         Y_hatAll.append(Y_hat)
+        
+        RMSE = np.array([sc_1, sc_2, RMSE])
         RMSE_all.append(RMSE)
         
         #showGrid(Xnew[:,:-1], Y_hat)
@@ -149,7 +149,7 @@ for s1 in range(scen_1):
         #showGrid(xinf, yinf)
         
         plt.close('all')
-        print("Finished scenario: ", s+1)
+        print("Finished scenario: ", scen_1, scen_2)
         print("RMSE is: ", RMSE)
         print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
 

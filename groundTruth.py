@@ -29,7 +29,7 @@ import GPy
 
 
 #####################################################
-# 01 Create dummy sparse and dense datasets
+# 01 Create dummy sparse and dense datasets through functions
 #####################################################
 
 # Grid dummy dataset with specified function over input space with rows (r) and columns (c).
@@ -37,13 +37,10 @@ import GPy
 # The ground truth process is then used to test and validate different models.
 
 #==================================
-# 01_1 Real function based dummy dataset
+# 01_1 Possible functions
 #==================================
 # Function options for creating dummy dataset over input space
 
-##############
-# Possible functions
-##############
 # Branin function
 def branin(X):
     y = (X[:,1]-5.1/(4*np.pi**2)*X[:,0]**2+5*X[:,0]/np.pi-6)**2
@@ -99,9 +96,9 @@ def showGrid(X, Y):
     plt.show()
     return None
 
-#==================================
-# 02_2 GP realization as ground truth processes
-#==================================
+#####################################################
+# 02 GP realization as ground truth processes
+#####################################################
 # Realization of dummy grid data through GP
 # Kernel options
 def kern():
@@ -150,10 +147,9 @@ def accGP():
     return None
 
 
-#==================================
-# 02_1 Inference through Coregionalized Gaussian processes (Multi-task GP/CoKriging)
-#==================================
-
+#####################################################
+# 03 Inference through Coregionalized Gaussian processes (Multi-task GP/CoKriging)
+#####################################################
 # Learn coregionalization model
 def coregionGP(X0, Y0, X1, Y1):
 #    X0widx = np.c_[X0,np.ones(X0.shape[0])*0]  # Add a column of coregionalized index through np.c_

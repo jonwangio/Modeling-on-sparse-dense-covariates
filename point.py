@@ -29,10 +29,9 @@ from mpl_toolkits.mplot3d import Axes3D
 from random import random
 from math import cos, sin, floor, sqrt, pi, ceil
 
-
-#==================================
-# 02_3 Sparse point observation from the ground truth processes
-#==================================
+#####################################################
+# 01 Sparse point observation from the ground truth processes
+#####################################################
 # TWO OPTIONS!!!
 # 1_perturbate the ground truth GP before sampling
 # 2_perturbate the randomly sampled points from the GP
