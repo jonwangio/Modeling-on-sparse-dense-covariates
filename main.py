@@ -123,7 +123,7 @@ for s1 in range(scen_1):
         !!! Dense covariate with controlled noise !!!
         '''
         #Xcov, Ycov = noiseCov(Xcov, Ycov, mean=-0, std=30)
-        sc_1, sc_2 = (1/15)*scen_1, (1/15)*scen_2  # Each scenario runs with scaled var and gamma
+        sc_1, sc_2 = (1/15)*s1, (1/15)*s2  # Each scenario runs with scaled var and gamma
         Xcov, Ycov = pb.noiseGPCov(X, Y, var=sc_1*var, gamma=sc_2*gamma)
         
         # Model inference through GP Coregionalization
@@ -149,10 +149,11 @@ for s1 in range(scen_1):
         #showGrid(xinf, yinf)
         
         plt.close('all')
-        print("Finished scenario: ", scen_1, scen_2)
+        print("Finished scenario: ", sc_1, sc_2)
         print("RMSE is: ", RMSE)
         print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
 
+np.save('RMSE.npy', RMSE_all)
 
 
 
