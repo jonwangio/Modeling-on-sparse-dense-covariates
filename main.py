@@ -149,7 +149,7 @@ for s1 in range(scen_1):
         #showGrid(xinf, yinf)
         
         plt.close('all')
-        print("Finished scenario: ", sc_1, sc_2)
+        print("Finished scenario: ", s1, s2)
         print("RMSE is: ", RMSE)
         print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
 
