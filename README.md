@@ -66,12 +66,17 @@ _Table 1 Actions for parameterizing scenarios that can be conducted incrementall
 Here, I identify three major **actions**, which can be conducted incrementally to generalize scenarios, such as **perturbation** can be added on top of point sampling to approximate a realistic condition. The **actions** boil down hierarchically into quantities to be parameterized, which successively forms scenarios. According to the amount of quantities to be parameterized in Table 1, it seems, again, many scenarios can be explored. But now the steps are clear, the starting point can be the most basic ones with blind sampling of point observations and covariate obtaind through simple linear transformation of the ground truth continuous field.
 
 ### 3.2 Action parameterization
-One option for the basic scenarios can be **blind sampling** of point obsevations and **linear transformation covariate** without any **perturbation**. This basic scenario can be a showcase of the action parameterization.
+One option for the basic scenarios can be **blind sampling** of point obsevations and **linear transformation covariate** without any **perturbation**. This basic scenario can be a showcase of action parameterization. In this case, I also fixed the linearly transformed covariate simply as -1.0 scaled original ground truth field. Thus only the point sampling scheme can be parameterized. By referring to **blind sampling**, I created the artificial point observation of the original field by applying the [_Poisson-Disc Sampling_ ](https://www.jasondavies.com/poisson-disc/) to ensure there will be no clusters or gaps among the sampled points caused by the commonly used pure random sampling. The _Poisson-Disc Sampling_ leads to a more natural point patterns distributed over an area. With this specific **blind sampling** scheme, there is only one parameter needed to control this sampling action: density or sparsity. Briefly, the basic scenario would be a reduced version of Fig.1 as shown in Fig.3 below. 
 
+<img src="/images/04_noiseFreeWorkflow.png"> 
 
+_Fig.3 Basic scenario with sparsity of point observation as parameterized action._
 
+Frankly, noise-free situation is too ideal to leverage the strength of any type of Gaussian Process modeling and be used as a standard scenario to benchmark different inference technique. By hypothesizing the points and covariate as correlated Gaussian Processes, the _Coregionalized Gaussian Process modeling_ implemented in python as [_GPy_](https://github.com/SheffieldML/notebook/tree/deploy/GPy) can easily find out that the correlation between the point observations of the field and covariate is -1.0 as the values in the points vary rigorously to the opposite to the corresponding values in the covariate. Sparsifying the point observations does not impact the result thus the accuracy stays with RMSE=0. More specifically, as I created the ground truth field with a variation lengthscale of 3.0, the _Gaussian Process modeling_ also found this lengthscale of the ground truth field quite accurately along the changing sparsity of the artificial point observation (Fig.4).
 
+<img src="/images/04_noiseFreeLenInf.png"> 
 
+_Fig.3 Inference of the lengthscale of the ground truth field along sparsified point observations._
 
 
 
