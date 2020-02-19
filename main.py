@@ -27,10 +27,12 @@ import matplotlib.pyplot as plt
 import pylab as pl
 import GPy
 
+'''
 from scipy import stats
 from random import random
 from math import cos, sin, floor, sqrt, pi, ceil
 from mpl_toolkits.mplot3d import Axes3D
+'''
 
 import groundTruth as gt
 import point as pt
@@ -153,7 +155,9 @@ for s1 in range(scen_1):
         print("RMSE is: ", RMSE)
         print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
 
-np.save('RMSE.npy', RMSE_all)
+RMSE_all = np.array(RMSE_all)
+np.save('RMSE_all.npy', RMSE_all)
+plt.scatter(RMSE_all[:,0], RMSE_all[:,1], c=RMSE_all[:,2], s=30)
 
 
 
