@@ -78,9 +78,10 @@ Frankly, noise-free situation is too ideal to leverage the strength of any type 
 
 _Fig.3 Inference of the lengthscale of the ground truth field along sparsified point observations._
 
-It is safe to conclude that making inference about the underlying field with only a few point observations can be quite reliable under the noise-free scenario. Of course, the covariate is also created with a very simple and restricted manner.
+It is safe to conclude that making inference about the underlying field with only a few point observations can be quite reliable under the noise-free scenario. Of course, the covariate is also created with a very simple and restricted manner. If the distribution of point observations does not matter that much, we need more serious experiment where the situation of covariate and noise are less ideal.
 
 
-
+4 Experiment
+-------------------
 
 
