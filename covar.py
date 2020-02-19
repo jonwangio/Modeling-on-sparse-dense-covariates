@@ -41,7 +41,7 @@ import perturb as pb
 # Generate dense covariate through linear transformation of the ground truth GP
 # Scale, shift in x1, x2, and y, convolution and etc..
 def linCov(X,Y):
-    scale = np.linspace(-2,2,1)
+    scale = np.linspace(-1,1,1)
     for s in scale:
         print('Scale Y by ', s)
         Ys = Y*s

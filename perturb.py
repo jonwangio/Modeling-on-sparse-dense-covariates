@@ -50,13 +50,16 @@ def noiseColorCov():
 
 # Generate dense covariate with advanced GP controlled noise
 def noiseGPCov(X, Y, var, gamma):
-    # GP controlled noise drawn from a covariance matrix generated from kernel
-    K = gt.arbKer(X, X, var=1, gamma=1)  # Reuse the arbitrary kernel to control noise
-    # Cholesky decomposition
-    L = np.linalg.cholesky(K + 1e-6*np.eye(K.shape[0]))
-    # Draw sample (can be multiple)
-    Y_prior = np.dot(L, np.random.normal(size=(X.shape[0],1)))  # Draw 1 sample
-    Y += Y_prior
-    gt.showGrid(X, Y)
-    gt.showGrid(X, Y_prior)
-    return(X, Y_prior)
+    if var==0:
+        Y_noise = Y
+    else:
+        # GP controlled noise drawn from a covariance matrix generated from kernel
+        K = gt.arbKer(X, X, var, gamma)  # Reuse the arbitrary kernel to control noise
+        # Cholesky decomposition
+        L = np.linalg.cholesky(K + 1e-6*np.eye(K.shape[0]))
+        # Draw sample (can be multiple)
+        Y_noise = np.dot(L, np.random.normal(size=(X.shape[0],1)))  # Draw 1 sample
+    Ynew = Y+Y_noise
+    gt.showGrid(X, Ynew)
+    gt.showGrid(X, Y_noise)
+    return(X, Ynew)

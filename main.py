@@ -122,14 +122,14 @@ for s1 in range(scen_1):
         # Dense covariate(s) with noise
         Xcov, Ycov = cov.linCov(Xp, Yp)  # Dense covariate through linear transformation
         '''
-        !!! Dense covariate with controlled noise !!!
+        !!! Dense covariate with controlled noise Xn, Yn !!!
         '''
-        #Xcov, Ycov = noiseCov(Xcov, Ycov, mean=-0, std=30)
+        #Xn, Yn = noiseCov(Xcov, Ycov, mean=-0, std=30)
         sc_1, sc_2 = (1/15)*s1, (1/15)*s2  # Each scenario runs with scaled var and gamma
-        Xcov, Ycov = pb.noiseGPCov(X, Y, var=sc_1*var, gamma=sc_2*gamma)
+        Xn, Yn = pb.noiseGPCov(Xcov, Ycov, var=(sc_1*np.sqrt(var))**2, gamma=sc_2*gamma)
         
         # Model inference through GP Coregionalization
-        mCov, Bnorm = gt.coregionGP(x, y, Xcov, Ycov)  # Coregionalization model
+        mCov, Bnorm = gt.coregionGP(x, y, Xn, Yn)  # Coregionalization model
         
         # Prediction through optimized model
         Xnew = np.hstack([Xp,np.zeros_like(Yp)])  # Using existing Xp as new location for prediction on sparse process
