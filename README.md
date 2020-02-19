@@ -74,9 +74,13 @@ _Fig.3 Basic scenario with sparsity of point observation as parameterized action
 
 Frankly, noise-free situation is too ideal to leverage the strength of any type of Gaussian Process modeling and be used as a standard scenario to benchmark different inference technique. By hypothesizing the points and covariate as correlated Gaussian Processes, the _Coregionalized Gaussian Process modeling_ implemented in python as [_GPy_](https://github.com/SheffieldML/notebook/tree/deploy/GPy) can easily find out that the correlation between the point observations of the field and covariate is -1.0 as the values in the points vary rigorously to the opposite to the corresponding values in the covariate. Sparsifying the point observations does not impact the result thus the accuracy stays with RMSE=0. More specifically, as I created the ground truth field with a variation lengthscale of 3.0, the _Gaussian Process modeling_ also found this lengthscale of the ground truth field quite accurately along the changing sparsity of the artificial point observation (Fig.4).
 
-<img src="/images/04_noiseFreeLenInf.png"> 
+<img src="/images/04_noiseFreeLenInf.png" width="500" height="250"> 
 
 _Fig.3 Inference of the lengthscale of the ground truth field along sparsified point observations._
+
+It is safe to conclude that making inference about the underlying field with only a few point observations can be quite reliable under the noise-free scenario. Of course, the covariate is also created with a very simple and restricted manner.
+
+
 
 
 
