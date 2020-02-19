@@ -66,7 +66,7 @@ _Table 1 Actions for parameterizing scenarios that can be conducted incrementall
 Here, I identify three major **actions**, which can be conducted incrementally to generalize scenarios, such as **perturbation** can be added on top of point sampling to approximate a realistic condition. The **actions** boil down hierarchically into quantities to be parameterized, which successively forms scenarios. According to the amount of quantities to be parameterized in Table 1, it seems, again, many scenarios can be explored. But now the steps are clear, the starting point can be the most basic ones with blind sampling of point observations and covariate obtaind through simple linear transformation of the ground truth continuous field.
 
 ### 3.2 Action parameterization
-The basic scenarios of **blind sampling** of point obsevations and **linear transformation covariate** without any **perturbation** is are used to showcase action parameterization.
+One option for the basic scenarios can be **blind sampling** of point obsevations and **linear transformation covariate** without any **perturbation**. This basic scenario can be a showcase of the action parameterization.
 
 
 
