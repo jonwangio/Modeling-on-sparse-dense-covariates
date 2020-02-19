@@ -50,7 +50,7 @@ def noiseColorCov():
 
 # Generate dense covariate with advanced GP controlled noise
 def noiseGPCov(X, Y, var, gamma):
-    if var==0:
+    if var==0 or gamma==0:
         Y_noise = Y
     else:
         # GP controlled noise drawn from a covariance matrix generated from kernel
