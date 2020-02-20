@@ -103,8 +103,8 @@ gt.showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 # 02_2 Scenario test
 #==================================
 # BASE SCENARIO: blind point samples and noise-free linear transformed covariate
-scen_1 = 3  # Total scenarios as number of parameter values
-scen_2 = 3
+scen_1 = 30  # Total scenarios as number of parameter values
+scen_2 = 30
 #totalScen = f(lengthscale)
 corr = []  # Inferred coregionalized GP correlation
 lengthscales = []  # Inferred lengthscale
