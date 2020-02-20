@@ -23,6 +23,7 @@
 #-------------------------------------------------------------------------------
 
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 import pylab as pl
 import GPy
@@ -88,7 +89,7 @@ plt.plot(testX, simY + 3 * simMse ** 0.5, '--g', linewidth=.5)
 #==================================
 # Dummy gridded dataset over input space
 x1min, x1max, x2min, x2max = -5, 10, 0, 15  # Domain of the input space
-row, col = 30, 30  # Grid number of the input space
+row, col = 40, 40  # Grid number of the input space
 var, gamma = 15**2, 3
 X, Y = gt.grid(x1min,x1max,x2min,x2max,row,col,var,gamma)  # Dummy grid dataset realized by function
 gt.showGrid(X, Y)  # Show function dummy grid
@@ -102,13 +103,14 @@ gt.showGrid(Xp, Yp)  # Dummy grid dataset approximated by GP as ground truth
 # 02_2 Scenario test
 #==================================
 # BASE SCENARIO: blind point samples and noise-free linear transformed covariate
-scen_1 = 30  # Total scenarios as number of parameter values
-scen_2 = 30
+scen_1 = 3  # Total scenarios as number of parameter values
+scen_2 = 3
 #totalScen = f(lengthscale)
 corr = []  # Inferred coregionalized GP correlation
 lengthscales = []  # Inferred lengthscale
 Y_hatAll = []  # Inferred Y_hat
 RMSE_all = []  # Mean sqaured error between Yp and Y_hat
+np.save('RMSE_all.npy', RMSE_all)
 
 for s1 in range(scen_1):
     for s2 in range(scen_2):
@@ -154,9 +156,11 @@ for s1 in range(scen_1):
         print("Finished scenario: ", s1, s2)
         print("RMSE is: ", RMSE)
         print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
+        
+        os.remove('RMSE_all.npy')
+        np.save('RMSE_all.npy', RMSE_all)
 
 RMSE_all = np.array(RMSE_all)
-np.save('RMSE_all.npy', RMSE_all)
 plt.scatter(RMSE_all[:,0], RMSE_all[:,1], c=RMSE_all[:,2], s=30)
 
 
