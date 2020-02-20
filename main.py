@@ -89,7 +89,7 @@ plt.plot(testX, simY + 3 * simMse ** 0.5, '--g', linewidth=.5)
 #==================================
 # Dummy gridded dataset over input space
 x1min, x1max, x2min, x2max = -5, 10, 0, 15  # Domain of the input space
-row, col = 40, 40  # Grid number of the input space
+row, col = 30, 30  # Grid number of the input space
 var, gamma = 15**2, 3
 X, Y = gt.grid(x1min,x1max,x2min,x2max,row,col,var,gamma)  # Dummy grid dataset realized by function
 gt.showGrid(X, Y)  # Show function dummy grid
@@ -126,9 +126,9 @@ for s1 in range(scen_1):
         '''
         !!! Dense covariate with controlled noise Xn, Yn !!!
         '''
-        #Xn, Yn = noiseCov(Xcov, Ycov, mean=-0, std=30)
         sc_1, sc_2 = (1/15)*s1, (1/15)*s2  # Each scenario runs with scaled var and gamma
-        Xn, Yn = pb.noiseGPCov(Xcov, Ycov, var=(sc_1*np.sqrt(var))**2, gamma=sc_2*gamma)
+        Xn, Yn = pb.noiseCov(X, Y, var=(sc_1*np.sqrt(var))**2, spar=sc_2*gamma)
+        #Xn, Yn = pb.noiseGPCov(Xcov, Ycov, var=(sc_1*np.sqrt(var))**2, gamma=sc_2*gamma)
         
         # Model inference through GP Coregionalization
         mCov, Bnorm = gt.coregionGP(x, y, Xn, Yn)  # Coregionalization model
@@ -160,10 +160,24 @@ for s1 in range(scen_1):
         os.remove('RMSE_all.npy')
         np.save('RMSE_all.npy', RMSE_all)
 
-RMSE_all = np.array(RMSE_all)
-plt.scatter(RMSE_all[:,0], RMSE_all[:,1], c=RMSE_all[:,2], s=30)
+# Visualizing the results
+err = np.load('RMSE_all.npy')
+err = np.array(err)
+err = err[~np.any(err == 0, axis=1)]
 
+## In 2D
+#plt.scatter(err[:,0], err[:,1], c=err[:,2], cmap='coolwarm', s=15)
+#plt.xlabel('Noise intensity over information')
+#plt.ylabel('Noise lengthscale over information')
 
+# In 3D
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+#ax.scatter(err[:,0], err[:,1], err[:,2]/15, c='coolwarm', marker='o', s=3)
+ax.plot_trisurf(err[:,0], err[:,1], err[:,2]/15, cmap='coolwarm', edgecolor='none')  # Error over info. std.
+ax.set_xlabel('Noise intensity over information')
+ax.set_ylabel('Noise lengthscale over information')
+ax.set_zlabel('Error over information')
 
 #####################################################
 # 03 REAL Training, testing and validation

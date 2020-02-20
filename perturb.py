@@ -29,19 +29,35 @@ import point as pt
 import covar as cov
 import perturb as pb
 
+from scipy import interpolate
 
-# Generate dense covariate as noisy versions of the ground truth GP
-def noiseCov(X, Y, mean, std):
-    # Simple noise follows N(mean, std**2)
-    Ynoise = std*np.random.randn(Y.size, 1)+mean
+#####################################################
+# 01 Generate dense covariate as noisy versions of the ground truth GP
+#####################################################
+
+# Simple random/white noise controlled by variance and sparsity
+def noiseCov(X, Y, var, spar):
+    # Grid same to the original X
+    xg1 = np.linspace(X[:,0].min(), X[:,0].max(), int(np.sqrt(len(X))))
+    xg2 = np.linspace(X[:,1].min(), X[:,1].max(), int(np.sqrt(len(X))))
+    grid_x, grid_y = np.meshgrid(xg1, xg2)
+    
+    # Grid scaled by sparsity parameter to create random/white noise
+    pix_size = np.ptp(X[:,0])/np.sqrt(len(X))  # Original pixel size
+    s = spar/pix_size  # Scale factor as number of pixels
+    xxg1 = np.linspace(X[:,0].min(), X[:,0].max(), int(np.sqrt(len(X))/s))
+    xxg2 = np.linspace(X[:,1].min(), X[:,1].max(), int(np.sqrt(len(X))/s))
+    grid_xx, grid_yy = np.meshgrid(xxg1, xxg2)
+    
+    ind = np.array([grid_xx.ravel(), grid_yy.ravel()]).T
+    Ynoise = np.sqrt(var)*np.random.randn(ind.shape[0], 1)
+    Ynoise = interpolate.griddata(ind, Ynoise, (grid_x, grid_y), method='linear')
+    Ynoise = Ynoise.reshape(-1,1)
     Y += Ynoise  # Call surface function
     gt.showGrid(X, Y)
     return (X, Y)
     
 # More advanced noise from the "Colors of Noise"
-def noiseBasis():
-    
-    return None
 
 def noiseColorCov():
     
