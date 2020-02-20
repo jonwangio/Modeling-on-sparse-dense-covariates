@@ -163,7 +163,7 @@ for s1 in range(scen_1):
 # Visualizing the results
 err = np.load('RMSE_all.npy')
 err = np.array(err)
-err = err[~np.any(err == 0, axis=1)]
+err = err[~np.any(err == 0, axis=1)]  # Remove rows with 0
 
 ## In 2D
 #plt.scatter(err[:,0], err[:,1], c=err[:,2], cmap='coolwarm', s=15)
