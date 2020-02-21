@@ -37,7 +37,7 @@ from scipy import interpolate
 
 # Simple random/white noise controlled by variance and sparsity
 def noiseCov(X, Y, var, spar):
-    if var==0 or gamma==0:
+    if var==0 or spar==0:
         Ynoise = 0
     else:
         # Grid same to the original X
