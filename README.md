@@ -85,6 +85,6 @@ It is safe to conclude that making inference about the underlying field with onl
 -------------------
 
 
-<img src="/images/05_GPnoiseVarGamma01.png" width="500" height="250"> 
+<img src="/images/05_GPnoiseVarGamma01.png" width="800" height="380"> 
 
 _Fig.4 The impact of actions regard to changing noise variance and lengthscale._
