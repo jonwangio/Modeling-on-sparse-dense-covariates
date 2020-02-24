@@ -78,7 +78,7 @@ def noiseGPCov(X, Y, var, gamma):
         L = np.linalg.cholesky(K + 1e-6*np.eye(K.shape[0]))
         # Draw sample (can be multiple)
         Ynoise = np.dot(L, np.random.normal(size=(X.shape[0],1)))  # Draw 1 sample
-    Ynew = Y+Ynoise
-    gt.showGrid(X, Ynew)
-    gt.showGrid(X, Ynoise)
-    return(X, Ynew)
+    Y += Ynoise
+    gt.showGrid(X, Y)
+    #gt.showGrid(X, Ynoise)
+    return(X, Y)

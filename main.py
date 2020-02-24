@@ -92,6 +92,7 @@ x1min, x1max, x2min, x2max = -5, 10, 0, 15  # Domain of the input space
 row, col = 30, 30  # Grid number of the input space
 var, gamma = 15**2, 3
 X, Y = gt.grid(x1min,x1max,x2min,x2max,row,col,var,gamma)  # Dummy grid dataset realized by function
+#X, Y = np.load('X.npy'), np.load('Y.npy')
 gt.showGrid(X, Y)  # Show function dummy grid
 
 # Ground truth representation through GP (parameters are var and lengthscale)
@@ -116,7 +117,7 @@ for s1 in range(scen_1):
     for s2 in range(scen_2):
         # Point samples as point observation
         #r = s+1  # Minimal distance (number of grid) separating points
-        r = 3
+        r = 2
         
         # X, Y = noiseCov(Xp, Yp, mean=100, std=30)  # Add noise to GP ground truth before point sampling
         x, y = pt.poissonPt(Xp, Yp, r)
@@ -127,7 +128,9 @@ for s1 in range(scen_1):
         !!! Dense covariate with controlled noise Xn, Yn !!!
         '''
         sc_1, sc_2 = (1/15)*s1, (1/15)*s2  # Each scenario runs with scaled var and gamma
-        Xn, Yn = pb.noiseCov(X, Y, var=(sc_1*np.sqrt(var))**2, spar=sc_2*gamma)
+        # White/random noise
+        Xn, Yn = pb.noiseCov(Xcov, Ycov, var=(sc_1*np.sqrt(var*0.2))**2, spar=sc_2*gamma)
+        # GP controlled smooth noise
         #Xn, Yn = pb.noiseGPCov(Xcov, Ycov, var=(sc_1*np.sqrt(var))**2, gamma=sc_2*gamma)
         
         # Model inference through GP Coregionalization
@@ -164,11 +167,12 @@ for s1 in range(scen_1):
 err = np.load('RMSE_all.npy')
 err = np.array(err)
 err = err[~np.any(err == 0, axis=1)]  # Remove rows with 0
+#err = err[~np.any(err > 50, axis=1)]  # Remove the extrema
 
 ## In 2D
-#plt.scatter(err[:,0], err[:,1], c=err[:,2], cmap='coolwarm', s=15)
-#plt.xlabel('Noise intensity over information')
-#plt.ylabel('Noise lengthscale over information')
+plt.scatter(err[:,0], err[:,1], c=err[:,2], cmap='coolwarm', s=15)
+plt.xlabel('Noise intensity over information')
+plt.ylabel('Noise lengthscale over information')
 
 # In 3D
 fig = plt.figure()
