@@ -45,12 +45,18 @@ import perturb as pb
 # 01 1D Toy Gaussian Process
 #####################################################
 
+#==================================
+# 01_1 1D single process example
+#==================================
+
 # Experimental taste of the Gaussian Process (GP) regression
-# Sample data from a sin/cos conjunctions
-X = np.linspace(0.05,0.95,10)[:,None]
-Y = -np.cos(np.pi*X) +np.sin(4*np.pi*X) + np.random.randn(10,1)*0.05
+# Sample data from a sinusoidal function
+X = np.random.rand(10)[:,None]; X=X*15-5
+Y = np.sin(X/2.) + np.random.randn(len(X),1)*0.05
 pl.figure()
 pl.plot(X,Y,'kx',mew=1.5)
+plt.xlim([-6., 11])
+plt.ylim([-2., 2.])
 
 # Specify the kernel and model
 k = GPy.kern.RBF(input_dim=1, variance=1., lengthscale=1.)
@@ -60,7 +66,7 @@ m.plot()
 # Manually optimize the model and show trained parameters
 m['.*var']=2.
 m['.*leng']=0.5
-m['Gaussian_noise.variance']=0.001
+m['Gaussian_noise.variance']=0.02
 m.plot()
 print(m)
 
@@ -70,7 +76,7 @@ m.plot()
 print(m)
 
 # Posterior realizations of the optimized model
-testX = np.linspace(0, 1, 101).reshape(-1, 1)
+testX = np.linspace(-5., 15., 1000).reshape(-1, 1)
 posteriorTestY = m.posterior_samples_f(testX, full_cov=True, size=3).reshape(-1,3) # Draw 3 realizations
 simY, simMse = m.predict(testX)
 
@@ -78,6 +84,46 @@ plt.plot(testX, posteriorTestY, linewidth=.5)
 plt.plot(X, Y, 'ok', markersize=4)
 plt.plot(testX, simY - 3 * simMse ** 0.5, '--g', linewidth=.5)
 plt.plot(testX, simY + 3 * simMse ** 0.5, '--g', linewidth=.5)
+
+
+#==================================
+# 01_2 1D coregionalized Gaussian Process
+#==================================
+
+# Experimental taste of 1D coregionalized Gaussian Process (GP) regression
+# Sample data from exactly the same sinusoidal function as above
+X1 = np.random.rand(10)[:,None]; X1=X1*12-5  # Process 1
+X2 = np.random.rand(8)[:,None]; X2=X2*6+4  # Process 2
+
+Y1 = np.sin(X1/2.) + np.random.randn(len(X1),1)*0.05  # From same function as above
+Y2 = np.sin(X2/2.) + np.random.randn(len(X2),1)*0.05
+
+plt.plot(X1,Y1,'kx', X2,Y2,'rx')
+plt.xlim([-6., 11])
+plt.ylim([-2., 2.])
+
+# Coregionalized Gaussian Process
+K = GPy.kern.RBF(1)
+icm = GPy.util.multioutput.ICM(input_dim=1,num_outputs=2,kernel=K)
+m = GPy.models.GPCoregionalizedRegression([X1,X2],[Y1,Y2],kernel=icm)
+m.optimize()
+
+# Plot
+xlim = (-6., 11); ylim = (-2., 2.)
+def plot_2outputs(m,xlim,ylim):
+    fig = pl.figure(figsize=(12,8))
+    #Output 1
+    ax1 = fig.add_subplot(211)
+    ax1.set_xlim(xlim)
+    ax1.set_title('Output 1')
+    m.plot(plot_limits=xlim,fixed_inputs=[(1,0)],which_data_rows=slice(0,len(X1)),ax=ax1)
+    #ax1.plot(X1[:,:1],Y1,'rx',mew=1.5)
+    #Output 2
+    ax2 = fig.add_subplot(212)
+    ax2.set_xlim(xlim)
+    ax2.set_title('Output 2')
+    m.plot(plot_limits=xlim,fixed_inputs=[(1,1)],which_data_rows=slice(len(X1),len(X1)+len(X2)),ax=ax2)
+    ax2.plot(X2[:,:1],Y2,'rx',mew=1.5)
 
  
 #####################################################
