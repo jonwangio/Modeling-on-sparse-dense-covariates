@@ -178,7 +178,7 @@ Y_hatAll = []  # Inferred Y_hat
 RMSE_all = []  # Mean sqaured error between Yp and Y_hat
 np.save('RMSE_all.npy', RMSE_all)
 
-for s0 in range(1, scen_0):
+for s0 in range(3, scen_0):  # Starting from the resolution of the grid data
     for s1 in range(scen_1):
         for s2 in range(scen_2):
             # Point samples as point observation
