@@ -17,18 +17,18 @@ This snippet of scientific experiment is fully devoted to examine the rationale 
 ########## generalize from Kriging to Gaussian Process
 
 
-<img src="/images/00_1Dsingle.png"> 
+<img src="/images/00_1Dsingle.png" width="700" height="250"> 
 
 _Fig.1 Sample process reconstruction from points in 1-dimension._
 
 
 
-<img src="/images/00_1DtwoProcesses.png"> 
+<img src="/images/00_1DtwoProcesses.png" width="700" height="500"> 
 
 _Fig.2 Point observation from coregionalized processes in 1-dimension._
 
 
-<img src="/images/00_1DtwoProcessesPred.png"> 
+<img src="/images/00_1DtwoProcessesPred.png" width="700" height="500"> 
 
 _Fig.3 Sample coregionalized processes reconstruction from points in 1-dimension._
 
@@ -48,27 +48,27 @@ Using Earth Observation (EO) data as a complement or even replacement of ground-
 The concept is intuitive: I will start to explore how continuous field reconstruction is impacted by scenarios of observations at hand, this can simply be inspected by watching the accuracy varies along with different scenarios. Then I will use real datasets for comparison and see if such variation is manifested. 
 
 ### 2.1 Dummy dataset
-To realize the concept, a dummy dataset is created representing any field that can be modelled by _f_ (Fig.1). In geostatistics, we also would like to know what the most conventional parameters are so that reconstructed field through geostatistical methods can be compared and validated. Thus I also try to approximate the dummy datasets using the most frequently used geostatistical method: the _Kriging_, which is more widely known as the _Gaussian Process_. Here I will continue to use _Gaussian Process_ for the notion that [it is more general in the field statistics and has a longer history](http://www.gaussianprocess.org/). Holding this dummy field with ground truth geostatistical parameters, the point observations and their grid covariate are created out of this ground truth field to simulate scenarios of situations we may encounter. For instance, a simple scenario could be achieved by linear transformation of the ground truth field to obtain the grid covariate, while the point observations can be [semi-random](https://blog.demofox.org/2017/05/29/when-random-numbers-are-too-random-low-discrepancy-sequences/) samples from the ground truth field (Fig.1). More general scenarios can be obtained by simulating and adding possible [noises](https://en.wikipedia.org/wiki/Colors_of_noise) on top of the simple scenario with only linearly transformation, whereas points can also be perturbed and more sparse.
+To realize the concept, a dummy dataset is created representing any field that can be modelled by _f_ (Fig.4). In geostatistics, we also would like to know what the most conventional parameters are so that reconstructed field through geostatistical methods can be compared and validated. Thus I also try to approximate the dummy datasets using the most frequently used geostatistical method: the _Kriging_, which is more widely known as the _Gaussian Process_. Here I will continue to use _Gaussian Process_ for the notion that [it is more general in the field statistics and has a longer history](http://www.gaussianprocess.org/). Holding this dummy field with ground truth geostatistical parameters, the point observations and their grid covariate are created out of this ground truth field to simulate scenarios of situations we may encounter. For instance, a simple scenario could be achieved by linear transformation of the ground truth field to obtain the grid covariate, while the point observations can be [semi-random](https://blog.demofox.org/2017/05/29/when-random-numbers-are-too-random-low-discrepancy-sequences/) samples from the ground truth field (Fig.4). More general scenarios can be obtained by simulating and adding possible [noises](https://en.wikipedia.org/wiki/Colors_of_noise) on top of the simple scenario with only linearly transformation, whereas points can also be perturbed and more sparse.
 
 <img src="/images/(20200130)Framework.png"> 
 
-_Fig.1 Conceptual design for examining field reconstruction through dummy point and grid covariate datasets._
+_Fig.4 Conceptual design for examining field reconstruction through dummy point and grid covariate datasets._
 
 The reconstruction can be achieved through either conventional geostatistical methods, or more advanced machine learning based techniques, but in either case the problem remains in the domain of regression, so any regression technique is subject to be used for comparison or setting the benchmark (to be decided in progress).
 
 ### 2.2 Real datasets
-The rationale of selecting real life cases is that continuous field is preferred. In the application of interpolating point observations, I would like to first avoid tricky situations of encountering sharp edges and patchness on the surface of fields. Thus I attempt to avoid any form of recognizable edges or boundaries in terms of the so called [_fiat_ and _bona fide_ boundaries](http://www.columbia.edu/~av72/papers/Ppr_2000.pdf). In this sense, airborne geographic phenonmenon which disperse over space and time would be handy choices. Here, I use near surface air temperature and pollutant NO<sub>2</sub> (Fig.2). Examination of these phenomena is practically significance as relevant to our environment, climate, and health. Below is a sample map of surface temperature and NO<sub>2</sub> at local scale around the city of Utrecht, the Netherlands.
+The rationale of selecting real life cases is that continuous field is preferred. In the application of interpolating point observations, I would like to first avoid tricky situations of encountering sharp edges and patchness on the surface of fields. Thus I attempt to avoid any form of recognizable edges or boundaries in terms of the so called [_fiat_ and _bona fide_ boundaries](http://www.columbia.edu/~av72/papers/Ppr_2000.pdf). In this sense, airborne geographic phenonmenon which disperse over space and time would be handy choices. Here, I use near surface air temperature and pollutant NO<sub>2</sub> (Fig.5). Examination of these phenomena is practically significance as relevant to our environment, climate, and health. Below is a sample map of surface temperature and NO<sub>2</sub> at local scale around the city of Utrecht, the Netherlands.
 
 <img src="/images/(20200130)realData.png" width="600" height="350">
 
-_Fig.2 Real datasets: air pollution (left) and surface temperature (right)._
+_Fig.5 Real datasets: air pollution (left) and surface temperature (right)._
 
 Both of the maps provide spatial distribution of temperature and NO<sub>2</sub> with resolution higher than 30m. The disperstion patterns on the two maps are distinctively different but intuitive and informative: high temperature is observed around densely built areas where building outlines are visible, whereas high concentration of NO<sub>2</sub> is around transportation arterials and road networks are highlighted. If one needs to see this kind of maps as frequent as daily or even hourly, no existing sensor would meet the demand. In fact, creating such maps daily or hourly largely relies on _in-situ_ observations, which can be dense or sparse depends on the place. In recent decades, the development of EO infrasctructure provides a significant complement to the _in-situ_ observations. However, the power of the EO in complementing the ground based _in-situ_ has not been thoroughly inspected. For instance, whether different spatial and temporal resolutions of the EO can capture the variations of the target phenomenon. More importantly, what EO actually "see" can be quite different from the target phenomenon measured near the ground, such as temperature--[the gap between surface and near surface air temperature is insufficiently understood](https://www.sciencedirect.com/science/article/pii/S0034425703000798). This potential weak correlation is well aligned with the scenario of using less desirable grid covariate for point observation interpolation. In short, framing these real life cases into the problem of **Sparse point interpolation with dense grid covariate(s)** is suitable.
 
 3 Techniques
 -------------------
 ### 3.1 Incremental actions
-A general framework of playing with dummy datasets for scenario analysis needs to encompass (again can be referred back to Fig.1):
+A general framework of playing with dummy datasets for scenario analysis needs to encompass (again can be referred back to Fig.4):
  - ground truth continuous random field generated by any arbitrary function _f_;
  - ground truth geostatistical parameter approximated by [_Gaussian Process_](https://github.com/SheffieldML/notebook/tree/deploy/GPy);
  - scenario of sparse or dense point observations _Z_ generated by sampling from the ground truth field _f_;
@@ -90,17 +90,17 @@ _Table 1 Actions for parameterizing scenarios that can be conducted incrementall
 Here, I identify three major **actions**, which can be conducted incrementally to generalize scenarios, such as **perturbation** can be added on top of point sampling to approximate a realistic condition. The **actions** boil down hierarchically into quantities to be parameterized, which successively forms scenarios. According to the amount of quantities to be parameterized in Table 1, it seems, again, many scenarios can be explored. But now the steps are clear, the starting point can be the most basic ones with blind sampling of point observations and covariate obtaind through simple linear transformation of the ground truth continuous field.
 
 ### 3.2 Action parameterization
-One option for the basic scenarios can be **blind sampling** of point obsevations and **linear transformation covariate** without any **perturbation**. This basic scenario can be a showcase of action parameterization. In this case, I also fixed the linearly transformed covariate simply as -1.0 scaled original ground truth field. Thus only the point sampling scheme can be parameterized. By referring to **blind sampling**, I created the artificial point observation of the original field by applying the [_Poisson-Disc Sampling_ ](https://www.jasondavies.com/poisson-disc/) to ensure there will be no clusters or gaps among the sampled points caused by the commonly used pure random sampling. The _Poisson-Disc Sampling_ leads to a more natural point patterns distributed over an area. With this specific **blind sampling** scheme, there is only one parameter needed to control this sampling action: density or sparsity. Briefly, the basic scenario would be a reduced version of Fig.1 as shown in Fig.3 below. 
+One option for the basic scenarios can be **blind sampling** of point obsevations and **linear transformation covariate** without any **perturbation**. This basic scenario can be a showcase of action parameterization. In this case, I also fixed the linearly transformed covariate simply as -1.0 scaled original ground truth field. Thus only the point sampling scheme can be parameterized. By referring to **blind sampling**, I created the artificial point observation of the original field by applying the [_Poisson-Disc Sampling_ ](https://www.jasondavies.com/poisson-disc/) to ensure there will be no clusters or gaps among the sampled points caused by the commonly used pure random sampling. The _Poisson-Disc Sampling_ leads to a more natural point patterns distributed over an area. With this specific **blind sampling** scheme, there is only one parameter needed to control this sampling action: density or sparsity. Briefly, the basic scenario would be a reduced version of Fig.4 as shown in Fig.6 below. 
 
 <img src="/images/04_noiseFreeWorkflow.png"> 
 
-_Fig.3 Basic scenario with sparsity of point observation as parameterized action._
+_Fig.6 Basic scenario with sparsity of point observation as parameterized action._
 
-Frankly, noise-free situation is too ideal to leverage the strength of any type of Gaussian Process modeling and be used as a standard scenario to benchmark different inference technique. By hypothesizing the points and covariate as correlated Gaussian Processes, the _Coregionalized Gaussian Process modeling_ implemented in python as [_GPy_](https://github.com/SheffieldML/notebook/tree/deploy/GPy) can easily find out that the correlation between the point observations of the field and covariate is -1.0 as the values in the points vary rigorously to the opposite to the corresponding values in the covariate. Sparsifying the point observations does not impact the result thus the accuracy stays with RMSE=0. More specifically, as I created the ground truth field with a variation lengthscale of 3.0, the _Gaussian Process modeling_ also found this lengthscale of the ground truth field quite accurately along the changing sparsity of the artificial point observation (Fig.4).
+Frankly, noise-free situation is too ideal to leverage the strength of any type of Gaussian Process modeling and be used as a standard scenario to benchmark different inference technique. By hypothesizing the points and covariate as correlated Gaussian Processes, the _Coregionalized Gaussian Process modeling_ implemented in python as [_GPy_](https://github.com/SheffieldML/notebook/tree/deploy/GPy) can easily find out that the correlation between the point observations of the field and covariate is -1.0 as the values in the points vary rigorously to the opposite to the corresponding values in the covariate. Sparsifying the point observations does not impact the result thus the accuracy stays with RMSE=0. More specifically, as I created the ground truth field with a variation lengthscale of 3.0, the _Gaussian Process modeling_ also found this lengthscale of the ground truth field quite accurately along the changing sparsity of the artificial point observation (Fig.7).
 
 <img src="/images/04_noiseFreeLenInf.png" width="500" height="250"> 
 
-_Fig.3 Inference of the lengthscale of the ground truth field along sparsified point observations._
+_Fig.7 Inference of the lengthscale of the ground truth field along sparsified point observations._
 
 It is safe to conclude that making inference about the underlying field with only a few point observations can be quite reliable under the noise-free scenario. Of course, the covariate is also created with a very simple and restricted manner. If the distribution of point observations does not matter that much, we need more serious experiment where the situation of covariate and noise are less ideal.
 
@@ -111,4 +111,4 @@ It is safe to conclude that making inference about the underlying field with onl
 
 <img src="/images/05_GPnoiseVarGamma01.png" width="800" height="380"> 
 
-_Fig.4 The impact of actions regard to changing noise variance and lengthscale._
+_Fig.8 The impact of actions regard to changing noise variance and lengthscale._
