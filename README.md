@@ -17,6 +17,21 @@ This snippet of scientific experiment is fully devoted to examine the rationale 
 ########## generalize from Kriging to Gaussian Process
 
 
+<img src="/images/00_1Dsingle.png"> 
+
+_Fig.1 Sample process reconstruction from points in 1-dimension._
+
+
+
+<img src="/images/00_1DtwoProcesses.png"> 
+
+_Fig.2 Point observation from coregionalized processes in 1-dimension._
+
+
+<img src="/images/00_1DtwoProcessesPred.png"> 
+
+_Fig.3 Sample coregionalized processes reconstruction from points in 1-dimension._
+
 
 
 2 Concepts
