@@ -223,7 +223,7 @@ for s0 in range(3, scen_0):  # Starting from the resolution of the grid data
             #showGrid(xinf, yinf)
             
             plt.close('all')
-            print("Finished scenario: ", s1, s2)
+            print("Finished scenario: ", s0, s1, s2)
             print("RMSE is: ", RMSE)
             print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
             
