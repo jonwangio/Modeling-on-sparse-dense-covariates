@@ -14,7 +14,7 @@ This snippet of scientific experiment is fully devoted to examine the rationale 
 
 2 Recap of the basics
 -------------------
-########## generalize from Kriging to Gaussian Process
+The default geostatistical methods to reconstruct continuous field from point observations is [_Kriging_](https://en.wikipedia.org/wiki/Kriging), and there are many variations of _Kriging_. In the simplist case, _Kriging_ assumes unobserved values along the continuous field are linear combination of the observed values. The key step is to estimate the linear weights that combine the observations for making predictions. The criteria of weights estimation is that the weights should ensure a minimized variance of predicted values.
 
 
 <img src="/images/00_1Dsingle.png" width="700" height="250"> 
