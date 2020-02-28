@@ -16,11 +16,15 @@ This snippet of scientific experiment is fully devoted to examine the rationale 
 -------------------
 The default geostatistical methods to reconstruct continuous field from point observations is [_Kriging_](https://en.wikipedia.org/wiki/Kriging), and there are many variations of _Kriging_. In the simplist case, _Kriging_ assumes unobserved values along the continuous field are linear combination of the observed values. The key step is to estimate the linear weights that combine the observations for making predictions. The criteria of weights estimation is that the weights should ensure a minimized variance of predicted values, which results in
 
+_**λ = C<sup>-1</sup>c**_
 
+where _**λ**_ is the vetor containing estimated weights. If someone is given with observations _**Y**_, the expectation value of the field inference at any location _**Y'**_ is
 
-![e1]
+_**E[Y'|Y] = m<sub>Y</sub> + c<sup>T</sup>C<sup>-1</sup>(y-m<sub>Y</sub>)**_
 
-[e1]: http://chart.apis.google.com/chart?cht=tx&chl=lambda=C^{-1}c
+along with the prediction variance
+
+_**Var(Y'|Y) = Var(Y) - c<sup>T</sup>C<sup>-1</sup>c**_
 
 
 <img src="/images/00_1Dsingle.png" width="700" height="250"> 
@@ -84,9 +88,8 @@ A general framework of playing with dummy datasets for scenario analysis needs t
  
 Critical actions can easily be identified at each point of data generation: ground truth field, point observations, and grid covariate. Selection of a particular algorithm for reconstructing the field can also be considered as another action, which I will put aside for now. Let's focus on data generation. In order to examine the accuracy as a function of the properties of the generated data, any **action** generating the data with certain property needs to be parameterized. For instance, the accuracy can be inspected by one of the property of the generated data--the noise intensity or _variance_ of the added noise to the point samples. Concretely, the accuracy is governed as:
 
-![e2]
+_**acc = f(actions)**_
 
-[e2]: http://chart.apis.google.com/chart?cht=tx&chl=acc=f(actions)
  ,where **actions** are parameterized according to the nature of the actions themselves. For instance, the **action** of generating point samples can be parameterized by the distribution of the sample locations. In this case, by saying "distribution", I need quantities such as _randomness_ and _adjacency_ (sparsity or density to separate samples). I also need sampling schemes such as [_blind_ or _adaptive_](https://ieeexplore.ieee.org/abstract/document/6112220) to create samples following parameterized distribution. For another instance, to make the point samples less ideal and more general, the **action** of adding noise to point samples can be parameterized according to how intense the noise can be. In this case, by saying "how intense" or "intensity", I may further constrain the idea as two quantities: _variance_(noise value is large or small) and _lengthscale_(how quickly the noise varies across space). However, apart from these particular cases, how many actions are expected and what are the parameters? It seems the **action(s)** can be arranged incrementally to render dummy datasets from ideal to general as in table below:
 
 _Table 1 Actions for parameterizing scenarios that can be conducted incrementally._
