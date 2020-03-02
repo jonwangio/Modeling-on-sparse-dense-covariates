@@ -178,57 +178,57 @@ Y_hatAll = []  # Inferred Y_hat
 RMSE_all = []  # Mean sqaured error between Yp and Y_hat
 np.save('RMSE_all.npy', RMSE_all)
 
-for s0 in range(3, scen_0):  # Starting from the resolution of the grid data
-    for s1 in range(scen_1):
-        for s2 in range(scen_2):
-            # Point samples as point observation
-            #r = 2  # Minimal distance (number of grid) separating points
-            sc_0 = (1/15)*s0
-            r = sc_0*gamma
-            
-            # X, Y = noiseCov(Xp, Yp, mean=100, std=30)  # Add noise to GP ground truth before point sampling
-            x, y = pt.poissonPt(Xp, Yp, r)
-            
-            # Dense covariate(s) with noise
-            Xcov, Ycov = cov.linCov(Xp, Yp)  # Dense covariate through linear transformation
-            '''
-            !!! Dense covariate with controlled noise Xn, Yn !!!
-            '''
-            sc_1, sc_2 = (1/15)*s1, (1/15)*s2  # Each scenario runs with scaled var and gamma
-            # White/random noise
-            Xn, Yn = pb.noiseCov(Xcov, Ycov, var=(sc_1*np.sqrt(var*0.2))**2, spar=sc_2*gamma)
-            # GP controlled smooth noise
-            #Xn, Yn = pb.noiseGPCov(Xcov, Ycov, var=(sc_1*np.sqrt(var))**2, gamma=sc_2*gamma)
-            
-            # Model inference through GP Coregionalization
-            mCov, Bnorm = gt.coregionGP(x, y, Xn, Yn)  # Coregionalization model
-            
-            # Prediction through optimized model
-            Xnew = np.hstack([Xp,np.zeros_like(Yp)])  # Using existing Xp as new location for prediction on sparse process
-            noise_dict = {'output_index':Xnew[:,-1].astype(int)}  # Indicate noise model to be used
-            Y_hat = mCov.predict(Xnew,Y_metadata=noise_dict)[0]
-            
-            RMSE = np.sqrt(np.square(np.subtract(Yp,Y_hat)).mean())
-            
-            corr.append(Bnorm[0,1])
-            lengthscales.append(mCov.ICM.rbf.lengthscale)
-            Y_hatAll.append(Y_hat)
-            
-            RMSE = np.array([sc_0, sc_1, sc_2, RMSE])
-            RMSE_all.append(RMSE)
-            
-            #showGrid(Xnew[:,:-1], Y_hat)
-            #xinf = mCov.X[len(x):,0:-1]
-            #yinf = mCov.Y[len(y):]
-            #showGrid(xinf, yinf)
-            
-            plt.close('all')
-            print("Finished scenario: ", s0, s1, s2)
-            print("RMSE is: ", RMSE)
-            print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
-            
-            os.remove('RMSE_all.npy')
-            np.save('RMSE_all.npy', RMSE_all)
+for s1 in range(scen_1):
+    for s2 in range(scen_2):
+        # Point samples as point observation
+        #r = 2  # Minimal distance (number of grid) separating points
+        s0 = 10
+        sc_0 = (1/15)*s0
+        r = sc_0*gamma
+        
+        # X, Y = noiseCov(Xp, Yp, mean=100, std=30)  # Add noise to GP ground truth before point sampling
+        x, y = pt.poissonPt(Xp, Yp, r)
+        
+        # Dense covariate(s) with noise
+        Xcov, Ycov = cov.linCov(Xp, Yp)  # Dense covariate through linear transformation
+        '''
+        !!! Dense covariate with controlled noise Xn, Yn !!!
+        '''
+        sc_1, sc_2 = (1/15)*s1, (1/15)*s2  # Each scenario runs with scaled var and gamma
+        # White/random noise
+        Xn, Yn = pb.noiseCov(Xcov, Ycov, var=(sc_1*np.sqrt(var*0.2))**2, spar=sc_2*gamma)
+        # GP controlled smooth noise
+        #Xn, Yn = pb.noiseGPCov(Xcov, Ycov, var=(sc_1*np.sqrt(var))**2, gamma=sc_2*gamma)
+        
+        # Model inference through GP Coregionalization
+        mCov, Bnorm = gt.coregionGP(x, y, Xn, Yn)  # Coregionalization model
+        
+        # Prediction through optimized model
+        Xnew = np.hstack([Xp,np.zeros_like(Yp)])  # Using existing Xp as new location for prediction on sparse process
+        noise_dict = {'output_index':Xnew[:,-1].astype(int)}  # Indicate noise model to be used
+        Y_hat = mCov.predict(Xnew,Y_metadata=noise_dict)[0]
+        
+        RMSE = np.sqrt(np.square(np.subtract(Yp,Y_hat)).mean())
+        
+        corr.append(Bnorm[0,1])
+        lengthscales.append(mCov.ICM.rbf.lengthscale)
+        Y_hatAll.append(Y_hat)
+        
+        RMSE = np.array([sc_0, sc_1, sc_2, RMSE])
+        RMSE_all.append(RMSE)
+        
+        #showGrid(Xnew[:,:-1], Y_hat)
+        #xinf = mCov.X[len(x):,0:-1]
+        #yinf = mCov.Y[len(y):]
+        #showGrid(xinf, yinf)
+        
+        plt.close('all')
+        print("Finished scenario: ", s0, s1, s2)
+        print("RMSE is: ", RMSE)
+        print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
+        
+        os.remove('RMSE_all.npy')
+        np.save('RMSE_all.npy', RMSE_all)
 
 # Visualizing the results
 err = np.load('RMSE_all.npy')
