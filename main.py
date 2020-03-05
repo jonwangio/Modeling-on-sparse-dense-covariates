@@ -182,7 +182,7 @@ for s1 in range(scen_1):
     for s2 in range(scen_2):
         # Point samples as point observation
         #r = 2  # Minimal distance (number of grid) separating points
-        s0 = 22
+        s0 = 28
         sc_0 = (1/15)*s0
         r = sc_0*gamma
         
