@@ -182,7 +182,7 @@ for s1 in range(scen_1):
     for s2 in range(scen_2):
         # Point samples as point observation
         #r = 2  # Minimal distance (number of grid) separating points
-        s0 = 28
+        s0 = 30
         sc_0 = (1/15)*s0
         r = sc_0*gamma
         
@@ -222,10 +222,10 @@ for s1 in range(scen_1):
         #yinf = mCov.Y[len(y):]
         #showGrid(xinf, yinf)
         
-        plt.close('all')
-        print("Finished scenario: ", s0, s1, s2)
-        print("RMSE is: ", RMSE)
-        print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
+#        plt.close('all')
+#        print("Finished scenario: ", s0, s1, s2)
+#        print("RMSE is: ", RMSE)
+#        print("Lengthscale is: ", mCov.ICM.rbf.lengthscale)
         
         os.remove('RMSE_all.npy')
         np.save('RMSE_all.npy', RMSE_all)
